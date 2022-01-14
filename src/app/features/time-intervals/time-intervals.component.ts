@@ -1,32 +1,13 @@
-import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core'
-import { INTERVAL_RANGE_IN_MINUTES, INTERVALS } from '../../shared/consts'
+import { Component, OnDestroy, OnInit } from '@angular/core'
+import { ELEMENT_DATA, INTERVAL_RANGE_IN_MINUTES, INTERVALS } from '../../shared/consts'
 import { FormControl } from '@angular/forms'
-import {BehaviorSubject, Observable, Subject} from 'rxjs'
+import { Subject } from 'rxjs'
 import { take, takeUntil } from 'rxjs/operators'
 import { TimeIntervalsService } from './services/time-intervals.service'
 import { IInterval } from '../../shared/interfaces/IInterval'
-import {MockDataGeneratorService} from "../../shared/services/mock-data-generator.service";
-import {MatTable, MatTableDataSource} from "@angular/material/table";
-
-export interface PeriodicElement {
-  name: string
-  position: number
-  weight: number
-  symbol: string
-}
-
-const ELEMENT_DATA: PeriodicElement[] = [
-  { position: 1, name: 'Hydrogen', weight: 1.0079, symbol: 'H' },
-  { position: 2, name: 'Helium', weight: 4.0026, symbol: 'He' },
-  { position: 3, name: 'Lithium', weight: 6.941, symbol: 'Li' },
-  { position: 4, name: 'Beryllium', weight: 9.0122, symbol: 'Be' },
-  { position: 5, name: 'Boron', weight: 10.811, symbol: 'B' },
-  { position: 6, name: 'Carbon', weight: 12.0107, symbol: 'C' },
-  { position: 7, name: 'Nitrogen', weight: 14.0067, symbol: 'N' },
-  { position: 8, name: 'Oxygen', weight: 15.9994, symbol: 'O' },
-  { position: 9, name: 'Fluorine', weight: 18.9984, symbol: 'F' },
-  { position: 10, name: 'Neon', weight: 20.1797, symbol: 'Ne' }
-]
+import { MockDataGeneratorService } from '../../shared/services/mock-data-generator.service'
+import { MatTableDataSource } from '@angular/material/table'
+import { IColumnsByRange } from '../../shared/interfaces/IColumnsByRange'
 
 @Component({
   selector: 'time-intervals',
@@ -34,38 +15,24 @@ const ELEMENT_DATA: PeriodicElement[] = [
   styleUrls: ['./time-intervals.component.scss']
 })
 export class TimeIntervalsComponent implements OnInit, OnDestroy {
-  @ViewChild('intervalsTable', {static: false}) table: MatTable<Element>
-
   public intervals = INTERVALS
   public intervalsValues = INTERVAL_RANGE_IN_MINUTES
   public intervalControl = new FormControl(this.intervalsValues.EVERY_FIVE)
   private unsubscribe$ = new Subject()
-  public displayedColumns = ['name', 'position', 'weight', 'symbol', 'star']
-  public displayedColumnsByRange: {
-    [INTERVAL_RANGE_IN_MINUTES.EVERY_FIVE]: Array<string>
-    [INTERVAL_RANGE_IN_MINUTES.EVERY_THIRTY]: Array<string>
-    [INTERVAL_RANGE_IN_MINUTES.EVERY_SIXTY]: Array<string>
-  } = {
+  public displayedColumns: Array<string> = []
+  public displayedColumnsByRange: IColumnsByRange = {
     [INTERVAL_RANGE_IN_MINUTES.EVERY_FIVE]: [],
     [INTERVAL_RANGE_IN_MINUTES.EVERY_THIRTY]: [],
     [INTERVAL_RANGE_IN_MINUTES.EVERY_SIXTY]: []
   }
-  /*  public intervalObjectsArray: {
-    [INTERVAL_RANGE_IN_MINUTES.EVERY_FIVE]: Array<IInterval>
-     [INTERVAL_RANGE_IN_MINUTES.EVERY_THIRTY]: Array<IInterval>
-     [INTERVAL_RANGE_IN_MINUTES.EVERY_SIXTY]: Array<IInterval>
-   } = {
-     [INTERVAL_RANGE_IN_MINUTES.EVERY_FIVE]: [],
-     [INTERVAL_RANGE_IN_MINUTES.EVERY_THIRTY]: [],
-     [INTERVAL_RANGE_IN_MINUTES.EVERY_SIXTY]: []
-   }*/
-  public dataSource = ELEMENT_DATA
+  public daysInMonth = [1, 2]
+
+  // since the structure of the array we are passing is dynamic we can not declare a type
+  // we know it will be an array of objects that will change depending on the interval selection
+  public dataSource: Array<{}> = [...ELEMENT_DATA] as Array<{}>
   public intervalsDataSource = new MatTableDataSource<any>([])
 
-  constructor(
-    private timeIntervalService: TimeIntervalsService,
-    private mockDataGenerator: MockDataGeneratorService
-    ) {}
+  constructor(private timeIntervalService: TimeIntervalsService, private mockDataGenerator: MockDataGeneratorService) {}
 
   ngOnInit(): void {
     this.renderIntervalsHeadings(this.intervalsValues.EVERY_FIVE)
@@ -73,10 +40,6 @@ export class TimeIntervalsComponent implements OnInit, OnDestroy {
       this.renderIntervalsHeadings(newInterval)
       this.intervalsDataSource.data = this.dataSource
     })
-  }
-
-  public isInterval(interval: INTERVAL_RANGE_IN_MINUTES) {
-    return this.intervalControl.value === interval
   }
 
   private renderIntervalsHeadings(interval: INTERVAL_RANGE_IN_MINUTES) {
@@ -94,8 +57,8 @@ export class TimeIntervalsComponent implements OnInit, OnDestroy {
       .pipe(take(1))
       .subscribe((values: Array<IInterval>) => {
         // this.intervalObjectsArray[interval] = values
-        this.displayedColumnsByRange[interval] = values.map( value => value.intervalName)
-        console.log(this.displayedColumnsByRange[interval] )
+        this.displayedColumnsByRange[interval] = values.map(value => value.intervalName)
+        console.log(this.displayedColumnsByRange[interval])
         this.displayedColumns = this.displayedColumnsByRange[interval]
         console.log(`the ${interval} minutes intervals were created`)
       })

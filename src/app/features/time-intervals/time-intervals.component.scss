@@ -9,23 +9,6 @@
     border-color: #eeeeee;
     max-width: 100%;
     overflow: auto;
-
-    table {
-      &.five-min {
-        width: 75000px;
-      }
-      &.thirty-min {
-        width: 15000px;
-      }
-      &.sixty-min {
-        width: 7500px;
-      }
-      text-align: center;
-      th {
-        text-align: center;
-
-      }
-    }
   }
 }
 
@@ -40,6 +23,5 @@
     position: absolute;
     right: 5px;
     top: 22px;
-
   }
 }

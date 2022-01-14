@@ -16,59 +16,21 @@
         <button mat-raised-button color="accent" (click)="generateMockData()">re-generate Mockdata</button>
       </mat-grid-tile>
     </mat-grid-list>
-    <!--select one month of with the datepicker-->
-
-    <!--    <mat-form-field appearance="fill">
-      <mat-label>Enter a date range</mat-label>
-      <mat-date-range-input [rangePicker]="picker">
-        <input matStartDate placeholder="Start date">
-        <input matEndDate placeholder="End date">
-      </mat-date-range-input>
-      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-      <mat-date-range-picker #picker></mat-date-range-picker>
-    </mat-form-field>-->
-
   </div>
-  <div class="table-container center">
-    <table mat-table #intervalsTable [dataSource]="dataSource" [ngClass]="{
-        'five-min': isInterval(intervalsValues.EVERY_FIVE),
-        'thirty-min': isInterval(intervalsValues.EVERY_THIRTY),
-        'sixty-min': isInterval(intervalsValues.EVERY_SIXTY)}">
-      <!-- Name Column -->
-     <!-- <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef>Name</th>
-        <td mat-cell *matCellDef="let element">{{element.name}}</td>
-      </ng-container>
-
-      &lt;!&ndash; Position Column &ndash;&gt;
-      <ng-container matColumnDef="position">
-        <th mat-header-cell *matHeaderCellDef>No.</th>
-        <td mat-cell *matCellDef="let element">{{element.position}}</td>
-      </ng-container>
-
-      &lt;!&ndash; Weight Column &ndash;&gt;
-      <ng-container matColumnDef="weight">
-        <th mat-header-cell *matHeaderCellDef>Weight</th>
-        <td mat-cell *matCellDef="let element">{{element.weight}}</td>
-      </ng-container>
-
-      &lt;!&ndash; Symbol Column &ndash;&gt;
-      <ng-container matColumnDef="symbol">
-        <th mat-header-cell *matHeaderCellDef>Symbol</th>
-        <td mat-cell *matCellDef="let element">{{element.symbol}}</td>
-      </ng-container>-->
-
-      <!-- Star Column -->
-      <ng-container *ngFor="let col of displayedColumns; let i = index" matColumnDef="{{col}}">
-        <th mat-header-cell *matHeaderCellDef>{{col}}</th>
-        <td mat-cell *matCellDef="let element">
-          <mat-icon aria-hidden="false" aria-label="Example home icon">{{element.name}}</mat-icon>
-        </td>
-      </ng-container>
-
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-    </table>
-  </div>
-  <div></div>
+  <mat-accordion multi>
+    <mat-expansion-panel *ngFor="let day of daysInMonth">
+      <mat-expansion-panel-header class="panel-header">
+        <mat-panel-title>
+          <h4>Day # {{day}}</h4>
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      <div class="table-container center">
+        <intervals-table
+          [dataSource]="dataSource"
+          [displayedColumns]="displayedColumns"
+          [intervalValue]="intervalControl.value"
+        ></intervals-table>
+      </div>
+    </mat-expansion-panel>
+  </mat-accordion>
 </div>

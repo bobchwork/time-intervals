@@ -6,7 +6,7 @@ import { AppComponent } from './app.component'
 import { SharedModule } from './shared/shared.module'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { RouterModule } from '@angular/router'
-import {TimeIntervalsService} from "./features/time-intervals/services/time-intervals.service";
+import { TimeIntervalsService } from './features/time-intervals/services/time-intervals.service'
 
 @NgModule({
   declarations: [AppComponent],
