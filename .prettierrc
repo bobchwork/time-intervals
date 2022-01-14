@@ -1,0 +1,14 @@
+singleQuote: true
+printWidth: 140
+tabWidth: 2
+tabs: true
+trailingComma: none
+arrowParens: avoid
+semi: false
+overrides:
+  - files: '*.component.html'
+    options:
+      parser: angular
+  - files: '*.html'
+    options:
+      parser: html

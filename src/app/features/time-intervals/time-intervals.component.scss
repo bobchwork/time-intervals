@@ -1,0 +1,45 @@
+#time-intervals-view {
+  h1 {
+    text-align: center;
+  }
+
+  .table-container {
+    border-width: 1px;
+    border-style: solid;
+    border-color: #eeeeee;
+    max-width: 100%;
+    overflow: auto;
+
+    table {
+      &.five-min {
+        width: 75000px;
+      }
+      &.thirty-min {
+        width: 15000px;
+      }
+      &.sixty-min {
+        width: 7500px;
+      }
+      text-align: center;
+      th {
+        text-align: center;
+
+      }
+    }
+  }
+}
+
+#time-selector {
+  display: flex;
+  flex-direction: column;
+  #range-select {
+    position: absolute;
+    left: 5px;
+  }
+  button {
+    position: absolute;
+    right: 5px;
+    top: 22px;
+
+  }
+}

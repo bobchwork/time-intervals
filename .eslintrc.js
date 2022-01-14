@@ -1,33 +1,32 @@
 module.exports = {
   root: true,
-  ignorePatterns: ["dist", "coverage"],
+  ignorePatterns: ['dist', 'coverage'],
   parserOptions: {
-    ecmaVersion: 2021,
+    ecmaVersion: 2021
   },
   overrides: [
     {
-      files: ["*.ts"],
+      files: ['*.ts'],
       parserOptions: {
-        project: ["tsconfig.json"],
-        createDefaultProgram: true,
+        project: ['tsconfig.json'],
+        createDefaultProgram: true
       },
       extends: [
-        "plugin:@angular-eslint/recommended",
-        "eslint:recommended",
-        "plugin:@typescript-eslint/recommended",
-        "plugin:prettier/recommended",
+        'plugin:@angular-eslint/recommended',
+        'eslint:recommended',
+        'plugin:@typescript-eslint/recommended',
+        'plugin:prettier/recommended'
       ],
       rules: {
-        "@typescript-eslint/no-non-null-assertion": "off",
-      },
+        '@typescript-eslint/no-non-null-assertion': 'off',
+        semi: 'off',
+        '@typescript-eslint/semi': ['error']
+      }
     },
     {
-      files: ["*.html"],
-      extends: [
-        "plugin:@angular-eslint/template/recommended",
-        "plugin:prettier/recommended",
-      ],
-      rules: {},
-    },
-  ],
-};
+      files: ['*.html'],
+      extends: ['plugin:@angular-eslint/template/recommended', 'plugin:prettier/recommended'],
+      rules: {}
+    }
+  ]
+}

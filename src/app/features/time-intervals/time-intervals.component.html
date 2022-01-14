@@ -1,0 +1,74 @@
+<div id="time-intervals-view" class="content">
+  <h1>Time intervals view</h1>
+  <div id="time-selector" class="center">
+    <mat-grid-list cols="3" rowHeight="100px">
+      <mat-grid-tile [colspan]="2">
+        <mat-form-field id="range-select" appearance="fill">
+          <mat-label>Select the time intervals</mat-label>
+          <mat-select [formControl]="intervalControl">
+            <mat-option [value]="intervalsValues.EVERY_FIVE"> {{ intervals.FIVE_MINS }}</mat-option>
+            <mat-option [value]="intervalsValues.EVERY_THIRTY"> {{ this.intervals.THIRTY_MINS }}</mat-option>
+            <mat-option [value]="intervalsValues.EVERY_SIXTY"> {{ intervals.ONE_HOUR }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </mat-grid-tile>
+      <mat-grid-tile>
+        <button mat-raised-button color="accent" (click)="generateMockData()">re-generate Mockdata</button>
+      </mat-grid-tile>
+    </mat-grid-list>
+    <!--select one month of with the datepicker-->
+
+    <!--    <mat-form-field appearance="fill">
+      <mat-label>Enter a date range</mat-label>
+      <mat-date-range-input [rangePicker]="picker">
+        <input matStartDate placeholder="Start date">
+        <input matEndDate placeholder="End date">
+      </mat-date-range-input>
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-date-range-picker #picker></mat-date-range-picker>
+    </mat-form-field>-->
+
+  </div>
+  <div class="table-container center">
+    <table mat-table #intervalsTable [dataSource]="dataSource" [ngClass]="{
+        'five-min': isInterval(intervalsValues.EVERY_FIVE),
+        'thirty-min': isInterval(intervalsValues.EVERY_THIRTY),
+        'sixty-min': isInterval(intervalsValues.EVERY_SIXTY)}">
+      <!-- Name Column -->
+     <!-- <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>Name</th>
+        <td mat-cell *matCellDef="let element">{{element.name}}</td>
+      </ng-container>
+
+      &lt;!&ndash; Position Column &ndash;&gt;
+      <ng-container matColumnDef="position">
+        <th mat-header-cell *matHeaderCellDef>No.</th>
+        <td mat-cell *matCellDef="let element">{{element.position}}</td>
+      </ng-container>
+
+      &lt;!&ndash; Weight Column &ndash;&gt;
+      <ng-container matColumnDef="weight">
+        <th mat-header-cell *matHeaderCellDef>Weight</th>
+        <td mat-cell *matCellDef="let element">{{element.weight}}</td>
+      </ng-container>
+
+      &lt;!&ndash; Symbol Column &ndash;&gt;
+      <ng-container matColumnDef="symbol">
+        <th mat-header-cell *matHeaderCellDef>Symbol</th>
+        <td mat-cell *matCellDef="let element">{{element.symbol}}</td>
+      </ng-container>-->
+
+      <!-- Star Column -->
+      <ng-container *ngFor="let col of displayedColumns; let i = index" matColumnDef="{{col}}">
+        <th mat-header-cell *matHeaderCellDef>{{col}}</th>
+        <td mat-cell *matCellDef="let element">
+          <mat-icon aria-hidden="false" aria-label="Example home icon">{{element.name}}</mat-icon>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+  </div>
+  <div></div>
+</div>
