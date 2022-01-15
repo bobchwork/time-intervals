@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core'
+import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core'
 import { MatTableDataSource } from '@angular/material/table'
 import { INTERVAL_RANGE_IN_MINUTES } from '../../../../shared/consts'
 

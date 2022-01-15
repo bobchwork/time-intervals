@@ -16,9 +16,7 @@ export class TimeIntervalsService {
   public calculateIntervals(intervalValue: INTERVAL_RANGE_IN_MINUTES): Observable<Array<IInterval>> {
     return this.createDayIntervals(intervalValue)
   }
-  public testService() {
-    return of('test service')
-  }
+
   private createDayIntervals(intervalsRange: INTERVAL_RANGE_IN_MINUTES): Observable<any> {
     return new Observable(observer => {
       const hoursInDay = 24

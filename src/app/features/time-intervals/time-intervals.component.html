@@ -2,7 +2,7 @@
   <h1>Time intervals view</h1>
   <div id="time-selector" class="center">
     <mat-grid-list cols="3" rowHeight="100px">
-      <mat-grid-tile [colspan]="2">
+      <mat-grid-tile [colspan]="1">
         <mat-form-field id="range-select" appearance="fill">
           <mat-label>Select the time intervals</mat-label>
           <mat-select [formControl]="intervalControl">
@@ -12,6 +12,15 @@
           </mat-select>
         </mat-form-field>
       </mat-grid-tile>
+      <mat-grid-tile [colspan]="1">
+        <mat-form-field id="month-select" appearance="fill">
+          <mat-label>Month to re-generate the data</mat-label>
+          <mat-select [formControl]="monthControl">
+            <mat-option *ngFor="let month of months; let i = index" [value]="i"> {{ month }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </mat-grid-tile>
+
       <mat-grid-tile>
         <button mat-raised-button color="accent" (click)="generateMockData()">re-generate Mockdata</button>
       </mat-grid-tile>
@@ -21,7 +30,7 @@
     <mat-expansion-panel *ngFor="let day of daysInMonth">
       <mat-expansion-panel-header class="panel-header">
         <mat-panel-title>
-          <h4>Day # {{day}}</h4>
+          <h4> {{months[selectedMonth]}} - Day # {{day}}</h4>
         </mat-panel-title>
       </mat-expansion-panel-header>
       <div class="table-container center">

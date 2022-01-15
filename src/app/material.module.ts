@@ -16,7 +16,7 @@ import { OverlayModule } from '@angular/cdk/overlay'
 import { MatChipsModule } from '@angular/material/chips'
 import { MatAutocompleteModule } from '@angular/material/autocomplete'
 import { MatFormFieldModule } from '@angular/material/form-field'
-import { MatOptionModule, MatRippleModule } from '@angular/material/core'
+import { MatNativeDateModule, MatOptionModule, MatRippleModule } from '@angular/material/core'
 import { MatDialogModule } from '@angular/material/dialog'
 import { MatRadioModule } from '@angular/material/radio'
 import { MatSnackBarModule } from '@angular/material/snack-bar'
@@ -67,7 +67,8 @@ import { MatSliderModule } from '@angular/material/slider'
     MatToolbarModule,
     MatTooltipModule,
     MatTreeModule,
-    MatSliderModule
+    MatSliderModule,
+    MatNativeDateModule
   ]
 })
 export class MaterialModule {}
