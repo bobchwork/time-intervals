@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
-import { INTERVAL_RANGE_IN_MINUTES, INTERVALS } from '../../../shared/consts'
-import { forkJoin, Observable, of } from 'rxjs'
+import { INTERVAL_RANGE_IN_MINUTES } from '../../../shared/consts'
+import { Observable } from 'rxjs'
 import { IInterval } from '../../../shared/interfaces/IInterval'
 import * as moment from 'moment'
 import { Moment } from 'moment'

@@ -1,14 +1,15 @@
-import { Component, OnDestroy, OnInit } from '@angular/core'
+import {AfterViewInit, Component, OnDestroy, OnInit} from '@angular/core'
 import {ELEMENT_DATA, INTERVAL_RANGE_IN_MINUTES, INTERVALS, MONTHS} from '../../shared/consts'
-import {FormControl, FormGroup} from '@angular/forms'
-import { Subject } from 'rxjs'
-import { take, takeUntil } from 'rxjs/operators'
-import { TimeIntervalsService } from './services/time-intervals.service'
-import { IInterval } from '../../shared/interfaces/IInterval'
-import { MockDataGeneratorService } from '../../shared/services/mock-data-generator.service'
-import { MatTableDataSource } from '@angular/material/table'
-import { IColumnsByRange } from '../../shared/interfaces/IColumnsByRange'
+import {FormControl} from '@angular/forms'
+import {combineLatest, forkJoin, Observable, Subject} from 'rxjs'
+import {take, takeUntil, tap} from 'rxjs/operators'
+import {TimeIntervalsService} from './services/time-intervals.service'
+import {IInterval} from '../../shared/interfaces/IInterval'
+import {MockDataGeneratorService} from '../../shared/services/mock-data-generator.service'
+import {MatTableDataSource} from '@angular/material/table'
+import {IColumnsByRange} from '../../shared/interfaces/IColumnsByRange'
 import * as moment from 'moment'
+import {IIntervalData} from "../../shared/interfaces/IIntervalData";
 
 @Component({
   selector: 'time-intervals',
@@ -29,41 +30,44 @@ export class TimeIntervalsComponent implements OnInit, OnDestroy {
     [INTERVAL_RANGE_IN_MINUTES.EVERY_THIRTY]: [],
     [INTERVAL_RANGE_IN_MINUTES.EVERY_SIXTY]: []
   }
-  public daysInMonth = [1, 2]
+  public rowsMonthMockData: any = {}
 
-  // since the structure of the array we are passing is dynamic we can not declare a type
-  // we know it will be an array of objects that will change depending on the interval selection
   public dataSource: Array<{}> = [...ELEMENT_DATA, ...ELEMENT_DATA, ...ELEMENT_DATA, ...ELEMENT_DATA, ...ELEMENT_DATA] as Array<{}>
   public intervalsDataSource = new MatTableDataSource<any>([])
+  private daysInMonth: number = moment().set({date: 1, month: this.selectedMonth}).daysInMonth()
 
-  constructor(private timeIntervalService: TimeIntervalsService, private mockDataGenerator: MockDataGeneratorService) {}
+  constructor(private timeIntervalService: TimeIntervalsService, private mockDataGenerator: MockDataGeneratorService) {
+  }
 
   ngOnInit(): void {
-    this.renderIntervalsHeadings(this.intervalsValues.EVERY_FIVE) // remove
-    // this.renderTableData(this.intervalsValues.EVERY_FIVE, daysInSelectedMonth)
+    this.generateMockData()
+    this.renderTableData(this.intervalsValues.EVERY_FIVE, this.daysInMonth)
     this.intervalControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe(newInterval => {
-      this.renderIntervalsHeadings(newInterval) //remove
-      //this.renderTableData(newInterval)
+      this.renderTableData(newInterval, this.daysInMonth)
       this.intervalsDataSource.data = this.dataSource
     })
-    this.monthControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe( month => {
+    this.monthControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe(month => {
       this.selectedMonth = month
+      this.daysInMonth = moment().set({date: 1, month: this.selectedMonth}).daysInMonth()
+      this.generateMockData()
     })
   }
+
   private renderTableData(interval: INTERVAL_RANGE_IN_MINUTES, daysInMonth: number = 30) {
-    this.renderIntervalsHeadings(this.intervalsValues.EVERY_FIVE)
+    this.renderIntervalsHeadings(interval)
     // this.renderIntervalsRows()
   }
+
+  // private sortInXIntervals(interval: INTERVAL_RANGE_IN_MINUTES) {}
+
   private renderIntervalsHeadings(interval: INTERVAL_RANGE_IN_MINUTES) {
     if (this.isIntervalAndCatched(interval)) {
       this.displayedColumns = this.displayedColumnsByRange[interval]
-      console.log('this headings have already been stored, they were catched')
+      // console.log('this headings have already been stored, they were catched')
       return
     }
     this.renderAndCatchColumns(interval)
   }
-
-  private generateRows(rowsNumber: number) {}
 
   private renderAndCatchColumns(interval: INTERVAL_RANGE_IN_MINUTES) {
     this.timeIntervalService
@@ -72,17 +76,41 @@ export class TimeIntervalsComponent implements OnInit, OnDestroy {
       .subscribe((values: Array<IInterval>) => {
         this.displayedColumnsByRange[interval] = values.map(value => value.intervalName)
         this.displayedColumns = this.displayedColumnsByRange[interval]
-        console.log(`the ${interval} minutes intervals were created`)
+        //   console.log(`the ${interval} minutes intervals were created`)
       })
   }
 
-  public generateMockData() {
-    this.mockDataGenerator
-      .oneMonthData(30)
-      .pipe(take(1))
-      .subscribe(values => {
-        console.log(values)
-      })
+
+  // it organizes the data we get from the mock.
+/*  private generateMockDataRows(rowsNumber: number = 4) {
+    const obsArray = []
+    for (let row = 0; row < rowsNumber; row++) {
+      obsArray.push(this.mockDataGenerator.oneMonthData(this.daysInMonth))
+    }
+    forkJoin(obsArray).subscribe(rows => {
+      if (!this.rowsMonthMockData[this.selectedMonth] || regenerateCached) {
+        this.rowsMonthMockData[this.selectedMonth] = rows.flat()
+        console.log(`data for the month  ${this.selectedMonth + 1} was generated and catched`)
+        console.log(this.rowsMonthMockData[this.selectedMonth])
+      }
+    })
+  }*/
+
+  // it generates the unorganized data as if we fetched it from and endpoint or a JSON file
+  public generateMockData(regenerateCached = false, rowsNumber: number = 1) {
+    const obsArray = []
+    console.log('days in month', this.daysInMonth)
+    for (let row = 0; row < rowsNumber; row++) {
+      obsArray.push(this.mockDataGenerator.oneMonthData(this.daysInMonth, this.selectedMonth))
+    }
+    combineLatest(obsArray).pipe(take(1)).subscribe(rows => {
+      if (!this.rowsMonthMockData[this.selectedMonth] || regenerateCached) {
+        this.rowsMonthMockData[this.selectedMonth] = rows
+        console.log(`data for the month  ${this.selectedMonth + 1} was generated and catched`)
+        console.log(`the data for  ${rowsNumber}  rows was added`)
+        console.log(this.rowsMonthMockData[this.selectedMonth])
+      }
+    })
   }
 
   private isIntervalAndCatched(interval: INTERVAL_RANGE_IN_MINUTES) {

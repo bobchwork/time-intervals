@@ -22,12 +22,14 @@
       </mat-grid-tile>
 
       <mat-grid-tile>
-        <button mat-raised-button color="accent" (click)="generateMockData()">re-generate Mockdata</button>
+        <button mat-raised-button color="accent" (click)="generateMockData(true)">re-generate Mockdata</button>
       </mat-grid-tile>
     </mat-grid-list>
   </div>
+  <mat-spinner  class="center top-50" *ngIf="!rowsMonthMockData[selectedMonth]"></mat-spinner>
+ <!-- <mat-accordion multi *ngIf="rowsMonthMockData[selectedMonth]">-->
   <mat-accordion multi>
-    <mat-expansion-panel *ngFor="let day of daysInMonth">
+    <mat-expansion-panel *ngFor="let day of [1,2]">
       <mat-expansion-panel-header class="panel-header">
         <mat-panel-title>
           <h4> {{months[selectedMonth]}} - Day # {{day}}</h4>

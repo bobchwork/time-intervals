@@ -9,32 +9,41 @@ import { Observable } from 'rxjs'
 })
 export class MockDataGeneratorService {
   private firstDayCurrentMonth = moment().set({ date: 1, hour: 0, minutes: 0, seconds: 0 })
+  private currentDayOfMonth = this.firstDayCurrentMonth.clone() // as a pivot
+  private selectedMonth = this.firstDayCurrentMonth.month()
 
   constructor() {}
+  public oneMonthData(daysInMonth: number, selectedMonth: number = this.selectedMonth) {
 
-  public resetFirstDayCurrentMonth() {
-    this.firstDayCurrentMonth.set({ day: 1, hour: 0, minutes: 0, seconds: 0 })
-  }
-
-  public oneMonthData(daysInMonth: number) {
+    this.selectedMonth = selectedMonth
+    this.resetFirstDayCurrentMonth(selectedMonth)
     return new Observable(observer => {
       let oneMonthDataArray: Array<IIntervalData> = []
       let oneDayDataArray: Array<IIntervalData> = []
-      for (let day = 0; day < daysInMonth; day++) {
+      let dInMonth = this.firstDayCurrentMonth.daysInMonth()
+      console.log(daysInMonth)
+      for (let day = 0; day < dInMonth; day++) {
         oneDayDataArray = this.oneDayData()
         oneMonthDataArray = [...oneMonthDataArray, ...oneDayDataArray]
       }
-      this.resetFirstDayCurrentMonth()
       observer.next(oneMonthDataArray)
     })
   }
+
+  public resetFirstDayCurrentMonth(selectedMonth: number) {
+    this.firstDayCurrentMonth.set({ date: 1, hour: 0, minutes: 0, seconds: 0})
+    this.firstDayCurrentMonth.set('month',selectedMonth)
+    this.currentDayOfMonth = this.firstDayCurrentMonth.clone()
+  }
+
 
   public oneDayData() {
     const hoursInADay = 24
     let oneDayDataArray: Array<IIntervalData> = []
     let oneHourDataArray: Array<IIntervalData> = []
     for (let a = 0; a < hoursInADay; a++) {
-      oneHourDataArray = this.oneHourData(this.firstDayCurrentMonth)
+    //  console.log('day in current month',this.currentDayOfMonth.format('DD-MM-YYYY'))
+      oneHourDataArray = this.oneHourData(this.currentDayOfMonth)
       oneDayDataArray = [...oneDayDataArray, ...oneHourDataArray]
     }
     // running in es2019
@@ -53,7 +62,7 @@ export class MockDataGeneratorService {
         ...oneHourDataArray,
         {
           time: parseInt(randomTime.format('X')),
-          value: randomTime.format('dddd, DD /HH:mm')
+          value: randomTime.format('DD,MMMM : HH:mm')
         }
       ]
     }
