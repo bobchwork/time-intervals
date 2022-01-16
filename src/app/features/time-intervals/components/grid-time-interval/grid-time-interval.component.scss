@@ -1,0 +1,18 @@
+#grid-time-interval {
+  background: burlywood;
+  max-width: 95%;
+  &.five-min {
+    width: 75000px;
+    background: green;
+  }
+  &.thirty-min {
+    width: 15000px;
+  }
+  &.sixty-min {
+    width: 7500px;
+  }
+  text-align: center;
+  th {
+    text-align: center;
+  }
+}

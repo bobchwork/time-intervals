@@ -4,6 +4,8 @@ import { Observable } from 'rxjs'
 import { IInterval } from '../../../shared/interfaces/IInterval'
 import * as moment from 'moment'
 import { Moment } from 'moment'
+import {IIntervalData} from "../../../shared/interfaces/IIntervalData";
+import {IColumnsByRange} from "../../../shared/interfaces/IColumnsByRange";
 
 @Injectable({
   providedIn: 'root'
@@ -64,5 +66,28 @@ export class TimeIntervalsService {
         ? moment('00:00', 'HH:mm').add(intervalsRange, 'minutes').format('HH:mm')
         : moment(endValue, 'HH:mm').add(intervalsRange, 'minutes').format('HH:mm')
     }
+  }
+
+  public returnSlicedArrayByDay(date: Moment, intervalNumber: number, rowsMonthMockData: any, selectedMonth: number, rowsQuantityInMock: number) {
+    let startSliceIndex = rowsMonthMockData[selectedMonth].findIndex((item: IIntervalData) => (moment.unix(item.time).format('DD') === date.format('DD')))
+    let endSliceIndex = startSliceIndex + (((60 * 24) / intervalNumber) * rowsQuantityInMock)
+
+    return rowsMonthMockData[selectedMonth].slice(startSliceIndex, endSliceIndex)
+  }
+  public getComparedColumns(interval: INTERVAL_RANGE_IN_MINUTES, headingIntervalsFullValues: IColumnsByRange,dayRowsData: any) {
+    let columns: Array<{}> = []
+    let isInInterval = false
+    headingIntervalsFullValues[interval].forEach(
+      ({start, end, intervalName}) => {
+        let startTimestamp = Number(start.format('X'))
+        let endTimestamp = Number(end.format('X'))
+        dayRowsData.map((item: IIntervalData) => {
+          isInInterval = moment.unix(item.time).isBetween(moment.unix(startTimestamp), moment.unix(endTimestamp))
+          if (isInInterval) {
+            columns.push({[intervalName]: item.value})
+          }
+        })
+      })
+    return columns
   }
 }

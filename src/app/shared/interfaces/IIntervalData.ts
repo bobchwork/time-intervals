@@ -1,4 +1,4 @@
 export interface IIntervalData {
-  time: number //unixtimestamp
+  time: number  //unixtimestamp
   value: string
 }

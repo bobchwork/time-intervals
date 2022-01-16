@@ -1,18 +1,22 @@
-import { Injectable } from '@angular/core'
+import {Injectable} from '@angular/core'
 import * as moment from 'moment'
-import { Moment } from 'moment'
-import { IIntervalData } from '../interfaces/IIntervalData'
-import { Observable } from 'rxjs'
+import {Moment} from 'moment'
+import {IIntervalData} from '../interfaces/IIntervalData'
+import {Observable} from 'rxjs'
+import {ELEMENT_DATA} from "../consts";
 
 @Injectable({
   providedIn: 'root'
 })
 export class MockDataGeneratorService {
-  private firstDayCurrentMonth = moment().set({ date: 1, hour: 0, minutes: 0, seconds: 0 })
+  private firstDayCurrentMonth = moment().set({date: 1, hour: 0, minutes: 0, seconds: 0})
   private currentDayOfMonth = this.firstDayCurrentMonth.clone() // as a pivot
   private selectedMonth = this.firstDayCurrentMonth.month()
+  public randomStrigsArray: Array<string> = ELEMENT_DATA.map(({name}) => name)
 
-  constructor() {}
+  constructor() {
+  }
+
   public oneMonthData(daysInMonth: number, selectedMonth: number = this.selectedMonth) {
 
     this.selectedMonth = selectedMonth
@@ -21,18 +25,18 @@ export class MockDataGeneratorService {
       let oneMonthDataArray: Array<IIntervalData> = []
       let oneDayDataArray: Array<IIntervalData> = []
       let dInMonth = this.firstDayCurrentMonth.daysInMonth()
-      console.log(daysInMonth)
       for (let day = 0; day < dInMonth; day++) {
         oneDayDataArray = this.oneDayData()
         oneMonthDataArray = [...oneMonthDataArray, ...oneDayDataArray]
       }
+      this.resetFirstDayCurrentMonth(selectedMonth)
       observer.next(oneMonthDataArray)
     })
   }
 
   public resetFirstDayCurrentMonth(selectedMonth: number) {
-    this.firstDayCurrentMonth.set({ date: 1, hour: 0, minutes: 0, seconds: 0})
-    this.firstDayCurrentMonth.set('month',selectedMonth)
+    this.firstDayCurrentMonth.set({date: 1, hour: 0, minutes: 0, seconds: 0})
+    this.firstDayCurrentMonth.set('month', selectedMonth)
     this.currentDayOfMonth = this.firstDayCurrentMonth.clone()
   }
 
@@ -42,7 +46,6 @@ export class MockDataGeneratorService {
     let oneDayDataArray: Array<IIntervalData> = []
     let oneHourDataArray: Array<IIntervalData> = []
     for (let a = 0; a < hoursInADay; a++) {
-    //  console.log('day in current month',this.currentDayOfMonth.format('DD-MM-YYYY'))
       oneHourDataArray = this.oneHourData(this.currentDayOfMonth)
       oneDayDataArray = [...oneDayDataArray, ...oneHourDataArray]
     }
@@ -54,15 +57,17 @@ export class MockDataGeneratorService {
     const intervalsOfFiveInHour = 60 / 5
     let oneHourDataArray: Array<IIntervalData> = []
     let randomTime
+    let randomIndexNumber
     let newDate = date
     for (let interval = 0; interval < intervalsOfFiveInHour; interval++) {
       randomTime = this.generateTimestampValue(0, 5, newDate)
       newDate.add(5, 'minutes')
+      randomIndexNumber = this.randomNumber(0, this.randomStrigsArray.length - 1)
       oneHourDataArray = [
         ...oneHourDataArray,
         {
-          time: parseInt(randomTime.format('X')),
-          value: randomTime.format('DD,MMMM : HH:mm')
+          time: Number(randomTime.format('X')),  // parseInt(randomTime.format('X'))
+          value: randomTime.format('DD-MM-YYYY HH:mm') // this.randomStrigsArray[randomIndexNumber] as string
         }
       ]
     }

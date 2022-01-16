@@ -1,7 +1,7 @@
 <div id="time-intervals-view" class="content">
   <h1>Time intervals view</h1>
   <div id="time-selector" class="center">
-    <mat-grid-list cols="3" rowHeight="100px">
+    <mat-grid-list cols="4" rowHeight="100px">
       <mat-grid-tile [colspan]="1">
         <mat-form-field id="range-select" appearance="fill">
           <mat-label>Select the time intervals</mat-label>
@@ -24,11 +24,16 @@
       <mat-grid-tile>
         <button mat-raised-button color="accent" (click)="generateMockData(true)">re-generate Mockdata</button>
       </mat-grid-tile>
+      <mat-grid-tile>
+        <button mat-raised-button color="accent" (click)="sortInXIntervals()">test</button>
+      </mat-grid-tile>
     </mat-grid-list>
   </div>
   <mat-spinner  class="center top-50" *ngIf="!rowsMonthMockData[selectedMonth]"></mat-spinner>
+  <grid-time-interval [headings]="displayedColumns" [dataSource]="dataSource" [intervalValue]="intervalControl.value">
+  </grid-time-interval>
  <!-- <mat-accordion multi *ngIf="rowsMonthMockData[selectedMonth]">-->
-  <mat-accordion multi>
+  <!--<mat-accordion multi>
     <mat-expansion-panel *ngFor="let day of [1,2]">
       <mat-expansion-panel-header class="panel-header">
         <mat-panel-title>
@@ -43,5 +48,5 @@
         ></intervals-table>
       </div>
     </mat-expansion-panel>
-  </mat-accordion>
+  </mat-accordion>-->
 </div>

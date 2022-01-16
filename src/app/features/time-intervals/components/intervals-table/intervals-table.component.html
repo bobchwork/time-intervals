@@ -1,6 +1,5 @@
 <table
   mat-table
-  #intervalsTable
   id="intervals-table"
   [dataSource]="dataSource"
   [ngClass]="{
@@ -11,7 +10,8 @@
   <ng-container *ngFor="let col of displayedColumns" matColumnDef="{{col}}">
     <th mat-header-cell *matHeaderCellDef>{{col}}</th>
     <td mat-cell *matCellDef="let element">
-      <span>{{element.name}}</span>
+      <span>{{element.value}} </span>
+      <!--<span>{{element.value}}</span>-->
     </td>
   </ng-container>
 

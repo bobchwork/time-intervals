@@ -1,14 +1,15 @@
-import {AfterViewInit, Component, OnDestroy, OnInit} from '@angular/core'
+import {Component, OnDestroy, OnInit} from '@angular/core'
 import {ELEMENT_DATA, INTERVAL_RANGE_IN_MINUTES, INTERVALS, MONTHS} from '../../shared/consts'
 import {FormControl} from '@angular/forms'
-import {combineLatest, forkJoin, Observable, Subject} from 'rxjs'
-import {take, takeUntil, tap} from 'rxjs/operators'
+import {combineLatest, Observable, Subject} from 'rxjs'
+import {take, takeUntil} from 'rxjs/operators'
 import {TimeIntervalsService} from './services/time-intervals.service'
 import {IInterval} from '../../shared/interfaces/IInterval'
 import {MockDataGeneratorService} from '../../shared/services/mock-data-generator.service'
 import {MatTableDataSource} from '@angular/material/table'
 import {IColumnsByRange} from '../../shared/interfaces/IColumnsByRange'
 import * as moment from 'moment'
+import {Moment} from 'moment'
 import {IIntervalData} from "../../shared/interfaces/IIntervalData";
 
 @Component({
@@ -25,7 +26,11 @@ export class TimeIntervalsComponent implements OnInit, OnDestroy {
   public monthControl = new FormControl(this.selectedMonth)
   private unsubscribe$ = new Subject()
   public displayedColumns: Array<string> = []
-  public displayedColumnsByRange: IColumnsByRange = {
+  public rowsQuantityInMock = 1
+  /*** contains the full value for the headings. start moment, end moment and label
+   * Anther solution is to add a pipe to remove the 3rd property label
+   * ***/
+  public headingIntervalsFullValues: IColumnsByRange = {
     [INTERVAL_RANGE_IN_MINUTES.EVERY_FIVE]: [],
     [INTERVAL_RANGE_IN_MINUTES.EVERY_THIRTY]: [],
     [INTERVAL_RANGE_IN_MINUTES.EVERY_SIXTY]: []
@@ -49,8 +54,17 @@ export class TimeIntervalsComponent implements OnInit, OnDestroy {
     this.monthControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe(month => {
       this.selectedMonth = month
       this.daysInMonth = moment().set({date: 1, month: this.selectedMonth}).daysInMonth()
+      console.log(this.selectedMonth)
       this.generateMockData()
     })
+/*        this.sortInXIntervals(this.intervalControl.value)
+          .pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+          console.log(data)
+        //  if(data.isDataGenerated) {
+          this.dataSource = data.rows
+            // console.log(data.columns)
+        //  }
+        })*/
   }
 
   private renderTableData(interval: INTERVAL_RANGE_IN_MINUTES, daysInMonth: number = 30) {
@@ -58,12 +72,39 @@ export class TimeIntervalsComponent implements OnInit, OnDestroy {
     // this.renderIntervalsRows()
   }
 
-  // private sortInXIntervals(interval: INTERVAL_RANGE_IN_MINUTES) {}
+  /*  private returnSlicedArrayByDay(date: Moment, intervalNumber: number) {
+      let startSliceIndex = this.rowsMonthMockData[this.selectedMonth]
+        .findIndex((item: IIntervalData) => (moment.unix(item.time).format('DD') === date.format('DD')))
+      let endSliceIndex = startSliceIndex + (((60 * 24) / intervalNumber) * this.rowsQuantityInMock)
+
+      console.log(this.rowsMonthMockData[this.selectedMonth])
+      console.log(endSliceIndex)
+      return this.rowsMonthMockData[this.selectedMonth].slice(startSliceIndex, endSliceIndex)
+    }*/
+
+  public sortInXIntervals(interval: INTERVAL_RANGE_IN_MINUTES = INTERVAL_RANGE_IN_MINUTES.EVERY_FIVE, selectedDay: number = 1): Observable<Array<{}>> {
+    return new Observable(observable => {
+      let columns: Array<{}> = []
+      let randomDay = moment().set('date', selectedDay)
+      let dayRowsData: Array<IIntervalData>
+      let intervalNumber: number
+      if (interval === INTERVAL_RANGE_IN_MINUTES.EVERY_FIVE) {
+        intervalNumber = 5
+      } else if (interval === INTERVAL_RANGE_IN_MINUTES.EVERY_THIRTY) {
+        intervalNumber = 30
+      } else {
+        intervalNumber = 60
+      }
+      dayRowsData = this.timeIntervalService.returnSlicedArrayByDay(randomDay, intervalNumber, this.rowsMonthMockData, this.selectedMonth, this.rowsQuantityInMock)
+      columns = this.timeIntervalService.getComparedColumns(interval, this.headingIntervalsFullValues, dayRowsData)
+      console.log(dayRowsData)
+      observable.next(columns)
+    })
+  }
 
   private renderIntervalsHeadings(interval: INTERVAL_RANGE_IN_MINUTES) {
     if (this.isIntervalAndCatched(interval)) {
-      this.displayedColumns = this.displayedColumnsByRange[interval]
-      // console.log('this headings have already been stored, they were catched')
+      this.displayedColumns = this.headingIntervalsFullValues[interval].map(value => value.intervalName)
       return
     }
     this.renderAndCatchColumns(interval)
@@ -74,47 +115,39 @@ export class TimeIntervalsComponent implements OnInit, OnDestroy {
       .calculateIntervals(interval)
       .pipe(take(1))
       .subscribe((values: Array<IInterval>) => {
-        this.displayedColumnsByRange[interval] = values.map(value => value.intervalName)
-        this.displayedColumns = this.displayedColumnsByRange[interval]
-        //   console.log(`the ${interval} minutes intervals were created`)
+        this.headingIntervalsFullValues[interval] = values
+        this.displayedColumns = values.map(value => value.intervalName)
       })
   }
 
-
-  // it organizes the data we get from the mock.
-/*  private generateMockDataRows(rowsNumber: number = 4) {
-    const obsArray = []
-    for (let row = 0; row < rowsNumber; row++) {
-      obsArray.push(this.mockDataGenerator.oneMonthData(this.daysInMonth))
-    }
-    forkJoin(obsArray).subscribe(rows => {
-      if (!this.rowsMonthMockData[this.selectedMonth] || regenerateCached) {
-        this.rowsMonthMockData[this.selectedMonth] = rows.flat()
-        console.log(`data for the month  ${this.selectedMonth + 1} was generated and catched`)
-        console.log(this.rowsMonthMockData[this.selectedMonth])
-      }
-    })
-  }*/
-
   // it generates the unorganized data as if we fetched it from and endpoint or a JSON file
-  public generateMockData(regenerateCached = false, rowsNumber: number = 1) {
+  public generateMockData(regenerateCached = false, rowsNumber: number = this.rowsQuantityInMock) {
     const obsArray = []
-    console.log('days in month', this.daysInMonth)
+    console.log(`-------------------`)
+    console.log('days in the month:', this.daysInMonth)
     for (let row = 0; row < rowsNumber; row++) {
       obsArray.push(this.mockDataGenerator.oneMonthData(this.daysInMonth, this.selectedMonth))
     }
     combineLatest(obsArray).pipe(take(1)).subscribe(rows => {
       if (!this.rowsMonthMockData[this.selectedMonth] || regenerateCached) {
-        this.rowsMonthMockData[this.selectedMonth] = rows
-        console.log(`data for the month  ${this.selectedMonth + 1} was generated and catched`)
+        this.rowsMonthMockData[this.selectedMonth] = rows.flat()
+        this.rowsMonthMockData[this.selectedMonth] = this.rowsMonthMockData[this.selectedMonth].sort(
+          (a: IIntervalData, b: IIntervalData) => (a.value < b.value)
+        )
+        console.log(`-------------------`)
+        console.log(`data for the month  ${this.selectedMonth + 1} was generated and stored`)
+        console.log(`-------------------`)
         console.log(`the data for  ${rowsNumber}  rows was added`)
-        console.log(this.rowsMonthMockData[this.selectedMonth])
+      } else {
+        console.log(`-------------------`)
+        console.log('Since the data was already generated and stored we dont generate ' +
+          'it again, press the regenerate mockdata button to regenerate the data')
       }
     })
   }
 
   private isIntervalAndCatched(interval: INTERVAL_RANGE_IN_MINUTES) {
-    return this.displayedColumnsByRange[interval]?.length > 0
+    return this.headingIntervalsFullValues[interval]?.length > 0
   }
 
   ngOnDestroy() {

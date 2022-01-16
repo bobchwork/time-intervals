@@ -1,0 +1,24 @@
+<div id="grid-time-interval">
+  <div
+    [ngClass]="{
+        'five-min': isInterval(intervalsValues.EVERY_FIVE),
+        'thirty-min': isInterval(intervalsValues.EVERY_THIRTY),
+        'sixty-min': isInterval(intervalsValues.EVERY_SIXTY)}"
+
+  >
+    <mat-grid-list #matGrid cols="4" rowHeight="100px">
+      <mat-grid-tile
+        *ngFor="let tile of tiles"
+        [colspan]="tile.cols"
+        [rowspan]="tile.rows">
+        {{tile.text}}
+      </mat-grid-tile>
+    </mat-grid-list>
+    <!--  <ng-content select="[headings]">
+
+      </ng-content>
+      <ng-content select="[grid-content]">
+
+      </ng-content>-->
+  </div>
+</div>

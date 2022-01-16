@@ -7,7 +7,7 @@ import { INTERVAL_RANGE_IN_MINUTES } from '../../../../shared/consts'
   templateUrl: './intervals-table.component.html',
   styleUrls: ['./intervals-table.component.scss']
 })
-export class IntervalsTableComponent implements OnInit {
+export class IntervalsTableComponent implements OnInit, OnChanges {
   @Input() dataSource: Array<{}> = []
   @Input() displayedColumns: Array<string> = []
   @Input() intervalValue: INTERVAL_RANGE_IN_MINUTES
@@ -16,7 +16,11 @@ export class IntervalsTableComponent implements OnInit {
 
   constructor() {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+  }
+  ngOnChanges(changes: SimpleChanges) {
+    //console.log(changes)
+  }
 
   public isInterval(interval: INTERVAL_RANGE_IN_MINUTES) {
     return this.intervalValue === interval
