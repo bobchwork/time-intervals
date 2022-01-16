@@ -1,5 +1,5 @@
 import {Component, OnDestroy, OnInit} from '@angular/core'
-import {ELEMENT_DATA, INTERVAL_RANGE_IN_MINUTES, INTERVALS, MONTHS} from '../../shared/consts'
+import {INTERVAL_RANGE_IN_MINUTES, INTERVALS, MONTHS} from '../../shared/consts'
 import {FormControl} from '@angular/forms'
 import {combineLatest, Observable, Subject} from 'rxjs'
 import {map, take, takeUntil, tap} from 'rxjs/operators'
@@ -9,9 +9,7 @@ import {MockDataGeneratorService} from '../../shared/services/mock-data-generato
 import {MatTableDataSource} from '@angular/material/table'
 import {IColumnsByRange} from '../../shared/interfaces/IColumnsByRange'
 import * as moment from 'moment'
-import {Moment} from 'moment'
 import {IIntervalData} from "../../shared/interfaces/IIntervalData";
-import {ITile} from "./components/grid-time-interval/grid-time-interval.component";
 
 @Component({
   selector: 'time-intervals',
@@ -27,7 +25,7 @@ export class TimeIntervalsComponent implements OnInit, OnDestroy {
   public monthControl = new FormControl(this.selectedMonth)
   private unsubscribe$ = new Subject()
   public displayedColumns: Array<string> = []
-  public rowsQuantityInMock = 30
+  public rowsQuantityInMock = 1
   /*** contains the full value for the headings. start moment, end moment and label
    * Anther solution is to add a pipe to remove the 3rd property label
    * ***/
@@ -68,6 +66,7 @@ export class TimeIntervalsComponent implements OnInit, OnDestroy {
 
   public renderIntervalRows(interval: INTERVAL_RANGE_IN_MINUTES) {
     const rowsObservables = []
+    console.log(this.rowsMonthMockData)
     for (let row = 0; row < this.rowsQuantityInMock; row++) {
       rowsObservables.push(this.sortInXIntervalsByDay(interval))
     }
@@ -81,8 +80,8 @@ export class TimeIntervalsComponent implements OnInit, OnDestroy {
   public sortData() {
     this.sortInXIntervalsByDay(this.intervalControl.value)
       .pipe(take(1)).subscribe((data) => {
-      console.log(data.concat(data))
-      console.log(this.displayedColumns.length)
+     /* console.log(data.concat(data))
+      console.log(this.displayedColumns.length)*/
       this.dataSource = data
 
     })
@@ -103,8 +102,9 @@ export class TimeIntervalsComponent implements OnInit, OnDestroy {
       intervalNumber = 60
     }
     dayRowsData = this.timeIntervalService.returnSlicedArrayByDay(randomDay, intervalNumber, this.rowsMonthMockData, this.selectedMonth, this.rowsQuantityInMock)
-
-    return this.timeIntervalService.getComparedColumns(interval, this.headingIntervalsFullValues, dayRowsData)
+    const allElements = this.rowsMonthMockData[INTERVAL_RANGE_IN_MINUTES.EVERY_FIVE]
+    console.log(allElements)
+    return this.timeIntervalService.getComparedColumns(interval, this.headingIntervalsFullValues, dayRowsData, allElements)
   }
 
   private renderIntervalsHeadings(interval: INTERVAL_RANGE_IN_MINUTES) {

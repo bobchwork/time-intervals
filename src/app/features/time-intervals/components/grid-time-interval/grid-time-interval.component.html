@@ -6,11 +6,11 @@
   >
     <div class="inner-grid-container"
          [ngClass]="{
-        'five-min': isInterval(intervalsValues.EVERY_FIVE) && headings.length === sourceData[0].length,
-        'thirty-min': isInterval(intervalsValues.EVERY_THIRTY) && headings.length === sourceData[0].length,
-        'sixty-min': isInterval(intervalsValues.EVERY_SIXTY) && headings.length === sourceData[0].length}"
+        'five-min': isInterval(intervalsValues.EVERY_FIVE) && headings.length === sourceData[0]?.length,
+        'thirty-min': isInterval(intervalsValues.EVERY_THIRTY) && headings.length === sourceData[0]?.length,
+        'sixty-min': isInterval(intervalsValues.EVERY_SIXTY) && headings.length === sourceData[0]?.length}"
     >
-      <table *ngIf="headings.length === sourceData[0].length; else wrongdata">
+      <table *ngIf="headings.length === sourceData[0]?.length; else wrongdata">
         <tr>
           <th *ngFor="let heading of headings">{{ heading }}</th>
         </tr>

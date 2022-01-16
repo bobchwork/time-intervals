@@ -76,19 +76,89 @@ export class TimeIntervalsService {
     return rowsMonthMockData[selectedMonth].slice(startSliceIndex, endSliceIndex)
   }
 
-  public getComparedColumns(interval: INTERVAL_RANGE_IN_MINUTES, headingIntervalsFullValues: IColumnsByRange, dayRowsData: Array<IIntervalData>): Observable<any> {
+  // the conent is already sorted by date, no need to do unnecessary moment comparisons.
+  public getComparedColumns(interval: INTERVAL_RANGE_IN_MINUTES, headingIntervalsFullValues: IColumnsByRange, dayRowsData: Array<IIntervalData>, allElements: Array<IIntervalData>): Observable<any> {
     return new Observable(observer => {
       let columns: Array<{}> = []
-      headingIntervalsFullValues[interval].forEach(
-        ({start, end, intervalName}, index) => {
-          columns.push({[intervalName]: dayRowsData[index].value})
+      let rowsStrArray = dayRowsData.map(val => val.value)
+      let slicedRow: any = [...rowsStrArray]
+      let multiplier = interval / 5
+      let start: number = 0
+      let end: number = 0
+     // console.log(allElements)
+      for(let index = 0 ; index < rowsStrArray.length; index++) {
+        start = index === 0 ? index : start + multiplier
+        end = index === 0 ? multiplier : end + multiplier
+        slicedRow = rowsStrArray.slice(start, end).join(' ')
+        columns.push({[this.strToEntry(headingIntervalsFullValues[interval][index].intervalName)]: slicedRow})
+      //  console.log(start, end)
+      }
+/*      rowsStrArray.forEach( (row, index )=> {
+        start = index === 0 ? index : start + multiplier
+        end = index === 0 ? multiplier : end + multiplier
+        // console.log(slicedRow)
+        slicedRow = rowsStrArray.slice(start, end).join(' ')
+/!*        console.log(slicedRow)
+        console.log('loop ',index)
+        console.log(start, end)*!/
+        columns.push({[this.strToEntry(headingIntervalsFullValues[interval][index].intervalName)]: slicedRow})
+
+      })*/
+/*
+      headingIntervalsFullValues[INTERVAL_RANGE_IN_MINUTES.EVERY_FIVE].forEach(
+        (headingContent, index) => {
+          start = index === 0 ? index : start + multiplier
+          end = index === 0 ? multiplier : end + multiplier
+          slicedRow = slicedRow.slice(start, end).join(' ')
+          console.log('loop ',index)
+          console.log(slicedRow.length)
+          console.log(start, end)
+          columns.push({[this.strToEntry(headingContent.intervalName)]: slicedRow})
+          slicedRow = [ ...rowsStrArray]
         }
       )
+*/
+      /*headingIntervalsFullValues[INTERVAL_RANGE_IN_MINUTES.EVERY_FIVE].forEach(
+        (headingContent, index) => {
+          start = index === 0 ? index : start + multiplier
+          end = index === 0 ? multiplier : end + multiplier
+          slicedRow = slicedRow.slice(start, end).join(' ')
+          console.log('loop ',index)
+          console.log(slicedRow.length)
+          console.log(start, end)
+          columns.push({[this.strToEntry(headingContent.intervalName)]: slicedRow})
+          slicedRow = [ ...rowsStrArray]
+        }
+      )*/
       columns = [columns]
       observer.next(columns)
     })
-
   }
+
+  private compareDates(dayRowsData: Array<IIntervalData>, headingContent: IInterval) {
+    let isInInterval = false
+    let rowsArray: Array<{}> = []
+    let pivotDate = moment.unix(dayRowsData[0].time)
+    let start = headingContent.start.set('date', 1)
+    let end = headingContent.end.set('date', 1)
+    pivotDate.set('date', 1)
+    for (let row = 0; row < dayRowsData.length; row++) {
+      isInInterval = moment.unix(dayRowsData[row].time).isBetween(start, end)
+      if (isInInterval) {
+        console.log('is in : ', headingContent.intervalName)
+        /*console.log(pivotDate.format('DD-MM-YYYY HH:mm'))
+        console.log(headingContent.start.format('DD-MM-YYYY HH:mm'))
+        console.log(pivotDate.isBetween(start, end))*/
+        rowsArray = [...rowsArray, {[this.strToEntry(headingContent.intervalName)]: dayRowsData[row].value}]
+      } else {
+
+        console.log('is NOT in : ', headingContent.intervalName)
+      }
+    }
+    //console.log(rowsArray)
+    return rowsArray
+  }
+
 
 // transforms 00:00 - 00:05 into 00000005 so the json looks like [00000005] : 'the str'
   public strToEntry(ex: string) {
