@@ -2,7 +2,7 @@ import {Component, OnDestroy, OnInit} from '@angular/core'
 import {ELEMENT_DATA, INTERVAL_RANGE_IN_MINUTES, INTERVALS, MONTHS} from '../../shared/consts'
 import {FormControl} from '@angular/forms'
 import {combineLatest, Observable, Subject} from 'rxjs'
-import {take, takeUntil} from 'rxjs/operators'
+import {map, take, takeUntil, tap} from 'rxjs/operators'
 import {TimeIntervalsService} from './services/time-intervals.service'
 import {IInterval} from '../../shared/interfaces/IInterval'
 import {MockDataGeneratorService} from '../../shared/services/mock-data-generator.service'
@@ -11,6 +11,7 @@ import {IColumnsByRange} from '../../shared/interfaces/IColumnsByRange'
 import * as moment from 'moment'
 import {Moment} from 'moment'
 import {IIntervalData} from "../../shared/interfaces/IIntervalData";
+import {ITile} from "./components/grid-time-interval/grid-time-interval.component";
 
 @Component({
   selector: 'time-intervals',
@@ -26,7 +27,7 @@ export class TimeIntervalsComponent implements OnInit, OnDestroy {
   public monthControl = new FormControl(this.selectedMonth)
   private unsubscribe$ = new Subject()
   public displayedColumns: Array<string> = []
-  public rowsQuantityInMock = 1
+  public rowsQuantityInMock = 30
   /*** contains the full value for the headings. start moment, end moment and label
    * Anther solution is to add a pipe to remove the 3rd property label
    * ***/
@@ -37,7 +38,7 @@ export class TimeIntervalsComponent implements OnInit, OnDestroy {
   }
   public rowsMonthMockData: any = {}
 
-  public dataSource: Array<{}> = [...ELEMENT_DATA, ...ELEMENT_DATA, ...ELEMENT_DATA, ...ELEMENT_DATA, ...ELEMENT_DATA] as Array<{}>
+  public dataSource: Array<Array<{}>> = []
   public intervalsDataSource = new MatTableDataSource<any>([])
   private daysInMonth: number = moment().set({date: 1, month: this.selectedMonth}).daysInMonth()
 
@@ -49,7 +50,7 @@ export class TimeIntervalsComponent implements OnInit, OnDestroy {
     this.renderTableData(this.intervalsValues.EVERY_FIVE, this.daysInMonth)
     this.intervalControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe(newInterval => {
       this.renderTableData(newInterval, this.daysInMonth)
-      this.intervalsDataSource.data = this.dataSource
+      // this.intervalsDataSource.data = this.dataSource
     })
     this.monthControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe(month => {
       this.selectedMonth = month
@@ -57,49 +58,53 @@ export class TimeIntervalsComponent implements OnInit, OnDestroy {
       console.log(this.selectedMonth)
       this.generateMockData()
     })
-/*        this.sortInXIntervals(this.intervalControl.value)
-          .pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-          console.log(data)
-        //  if(data.isDataGenerated) {
-          this.dataSource = data.rows
-            // console.log(data.columns)
-        //  }
-        })*/
   }
 
   private renderTableData(interval: INTERVAL_RANGE_IN_MINUTES, daysInMonth: number = 30) {
     this.renderIntervalsHeadings(interval)
-    // this.renderIntervalsRows()
+    this.renderIntervalRows(interval)
+   // this.sortData()
   }
 
-  /*  private returnSlicedArrayByDay(date: Moment, intervalNumber: number) {
-      let startSliceIndex = this.rowsMonthMockData[this.selectedMonth]
-        .findIndex((item: IIntervalData) => (moment.unix(item.time).format('DD') === date.format('DD')))
-      let endSliceIndex = startSliceIndex + (((60 * 24) / intervalNumber) * this.rowsQuantityInMock)
-
-      console.log(this.rowsMonthMockData[this.selectedMonth])
-      console.log(endSliceIndex)
-      return this.rowsMonthMockData[this.selectedMonth].slice(startSliceIndex, endSliceIndex)
-    }*/
-
-  public sortInXIntervals(interval: INTERVAL_RANGE_IN_MINUTES = INTERVAL_RANGE_IN_MINUTES.EVERY_FIVE, selectedDay: number = 1): Observable<Array<{}>> {
-    return new Observable(observable => {
-      let columns: Array<{}> = []
-      let randomDay = moment().set('date', selectedDay)
-      let dayRowsData: Array<IIntervalData>
-      let intervalNumber: number
-      if (interval === INTERVAL_RANGE_IN_MINUTES.EVERY_FIVE) {
-        intervalNumber = 5
-      } else if (interval === INTERVAL_RANGE_IN_MINUTES.EVERY_THIRTY) {
-        intervalNumber = 30
-      } else {
-        intervalNumber = 60
-      }
-      dayRowsData = this.timeIntervalService.returnSlicedArrayByDay(randomDay, intervalNumber, this.rowsMonthMockData, this.selectedMonth, this.rowsQuantityInMock)
-      columns = this.timeIntervalService.getComparedColumns(interval, this.headingIntervalsFullValues, dayRowsData)
-      console.log(dayRowsData)
-      observable.next(columns)
+  public renderIntervalRows(interval: INTERVAL_RANGE_IN_MINUTES) {
+    const rowsObservables = []
+    for (let row = 0; row < this.rowsQuantityInMock; row++) {
+      rowsObservables.push(this.sortInXIntervalsByDay(interval))
+    }
+    combineLatest(rowsObservables).pipe(take(1), map( ar => ar.flat() )).subscribe(rows => {
+      //console.log(rows[0])
+      console.log(rows)
+      this.dataSource = rows
     })
+  }
+
+  public sortData() {
+    this.sortInXIntervalsByDay(this.intervalControl.value)
+      .pipe(take(1)).subscribe((data) => {
+      console.log(data.concat(data))
+      console.log(this.displayedColumns.length)
+      this.dataSource = data
+
+    })
+  }
+
+  // grouped by day
+  public sortInXIntervalsByDay(interval: INTERVAL_RANGE_IN_MINUTES = INTERVAL_RANGE_IN_MINUTES.EVERY_FIVE, selectedDay: number = 1): Observable<any> {
+    console.log('sorting')
+    //  return new Observable(observable => {
+    let randomDay = moment().set('date', selectedDay)
+    let dayRowsData: Array<IIntervalData>
+    let intervalNumber: number
+    if (interval === INTERVAL_RANGE_IN_MINUTES.EVERY_FIVE) {
+      intervalNumber = 5
+    } else if (interval === INTERVAL_RANGE_IN_MINUTES.EVERY_THIRTY) {
+      intervalNumber = 30
+    } else {
+      intervalNumber = 60
+    }
+    dayRowsData = this.timeIntervalService.returnSlicedArrayByDay(randomDay, intervalNumber, this.rowsMonthMockData, this.selectedMonth, this.rowsQuantityInMock)
+
+    return this.timeIntervalService.getComparedColumns(interval, this.headingIntervalsFullValues, dayRowsData)
   }
 
   private renderIntervalsHeadings(interval: INTERVAL_RANGE_IN_MINUTES) {
@@ -125,25 +130,24 @@ export class TimeIntervalsComponent implements OnInit, OnDestroy {
     const obsArray = []
     console.log(`-------------------`)
     console.log('days in the month:', this.daysInMonth)
-    for (let row = 0; row < rowsNumber; row++) {
-      obsArray.push(this.mockDataGenerator.oneMonthData(this.daysInMonth, this.selectedMonth))
-    }
-    combineLatest(obsArray).pipe(take(1)).subscribe(rows => {
-      if (!this.rowsMonthMockData[this.selectedMonth] || regenerateCached) {
-        this.rowsMonthMockData[this.selectedMonth] = rows.flat()
+    if (!this.rowsMonthMockData[this.selectedMonth] || regenerateCached) {
+      for (let row = 0; row < rowsNumber; row++) {
+        obsArray.push(this.mockDataGenerator.oneMonthData(this.daysInMonth, this.selectedMonth))
+      }
+      combineLatest(obsArray).pipe(take(1)).subscribe(rows => {
+
+        //console.log(rows)
+        this.rowsMonthMockData[this.selectedMonth] = rows.flat() // rows.flat()
         this.rowsMonthMockData[this.selectedMonth] = this.rowsMonthMockData[this.selectedMonth].sort(
           (a: IIntervalData, b: IIntervalData) => (a.value < b.value)
         )
-        console.log(`-------------------`)
-        console.log(`data for the month  ${this.selectedMonth + 1} was generated and stored`)
-        console.log(`-------------------`)
-        console.log(`the data for  ${rowsNumber}  rows was added`)
-      } else {
-        console.log(`-------------------`)
-        console.log('Since the data was already generated and stored we dont generate ' +
-          'it again, press the regenerate mockdata button to regenerate the data')
-      }
-    })
+        /*   console.log(`-------------------`)
+           console.log(`data for the month  ${this.selectedMonth + 1} was generated and stored`)
+           console.log(`-------------------`)
+           console.log(`the data for  ${rowsNumber}  rows was added`)*/
+
+      })
+    }
   }
 
   private isIntervalAndCatched(interval: INTERVAL_RANGE_IN_MINUTES) {

@@ -1,9 +1,9 @@
-import { Injectable } from '@angular/core'
-import { INTERVAL_RANGE_IN_MINUTES } from '../../../shared/consts'
-import { Observable } from 'rxjs'
-import { IInterval } from '../../../shared/interfaces/IInterval'
+import {Injectable} from '@angular/core'
+import {INTERVAL_RANGE_IN_MINUTES} from '../../../shared/consts'
+import {Observable} from 'rxjs'
+import {IInterval} from '../../../shared/interfaces/IInterval'
 import * as moment from 'moment'
-import { Moment } from 'moment'
+import {Moment} from 'moment'
 import {IIntervalData} from "../../../shared/interfaces/IIntervalData";
 import {IColumnsByRange} from "../../../shared/interfaces/IColumnsByRange";
 
@@ -13,7 +13,8 @@ import {IColumnsByRange} from "../../../shared/interfaces/IColumnsByRange";
 export class TimeIntervalsService {
   private MINS_IN_HOUR = 60
 
-  constructor() {}
+  constructor() {
+  }
 
   public calculateIntervals(intervalValue: INTERVAL_RANGE_IN_MINUTES): Observable<Array<IInterval>> {
     return this.createDayIntervals(intervalValue)
@@ -74,20 +75,25 @@ export class TimeIntervalsService {
 
     return rowsMonthMockData[selectedMonth].slice(startSliceIndex, endSliceIndex)
   }
-  public getComparedColumns(interval: INTERVAL_RANGE_IN_MINUTES, headingIntervalsFullValues: IColumnsByRange,dayRowsData: any) {
-    let columns: Array<{}> = []
-    let isInInterval = false
-    headingIntervalsFullValues[interval].forEach(
-      ({start, end, intervalName}) => {
-        let startTimestamp = Number(start.format('X'))
-        let endTimestamp = Number(end.format('X'))
-        dayRowsData.map((item: IIntervalData) => {
-          isInInterval = moment.unix(item.time).isBetween(moment.unix(startTimestamp), moment.unix(endTimestamp))
-          if (isInInterval) {
-            columns.push({[intervalName]: item.value})
-          }
-        })
-      })
-    return columns
+
+  public getComparedColumns(interval: INTERVAL_RANGE_IN_MINUTES, headingIntervalsFullValues: IColumnsByRange, dayRowsData: Array<IIntervalData>): Observable<any> {
+    return new Observable(observer => {
+      let columns: Array<{}> = []
+      headingIntervalsFullValues[interval].forEach(
+        ({start, end, intervalName}, index) => {
+          columns.push({[intervalName]: dayRowsData[index].value})
+        }
+      )
+      columns = [columns]
+      observer.next(columns)
+    })
+
   }
+
+// transforms 00:00 - 00:05 into 00000005 so the json looks like [00000005] : 'the str'
+  public strToEntry(ex: string) {
+    let reg = /[\s:-]/g
+    return ex.replace(reg, '')
+  }
+
 }

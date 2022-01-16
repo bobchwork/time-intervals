@@ -1,16 +1,32 @@
 #grid-time-interval {
-  background: burlywood;
-  max-width: 95%;
-  &.five-min {
-    width: 75000px;
-    background: green;
+  max-width: 100%;
+  min-height: 400px;
+  .main-grid-container {
+    overflow-x:auto;
   }
-  &.thirty-min {
-    width: 15000px;
+  .inner-grid-container {
+    table {
+      th, td {
+        width: 240px;
+        padding: 10px;
+      }
+    }
+    &.five-min {
+      width: 75000px;
+    }
+    &.thirty-min {
+      width: 12000px;
+    }
+    &.sixty-min {
+      width: 6000px;
+    }
+    .heading-row {
+      display: inline-flex;
+      height: 100px;
+    }
+
   }
-  &.sixty-min {
-    width: 7500px;
-  }
+
   text-align: center;
   th {
     text-align: center;

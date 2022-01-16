@@ -25,11 +25,10 @@
         <button mat-raised-button color="accent" (click)="generateMockData(true)">re-generate Mockdata</button>
       </mat-grid-tile>
       <mat-grid-tile>
-        <button mat-raised-button color="accent" (click)="sortInXIntervals()">test</button>
+        <button mat-raised-button color="accent" (click)="sortData()">test</button>
       </mat-grid-tile>
     </mat-grid-list>
   </div>
-  <mat-spinner  class="center top-50" *ngIf="!rowsMonthMockData[selectedMonth]"></mat-spinner>
   <grid-time-interval [headings]="displayedColumns" [dataSource]="dataSource" [intervalValue]="intervalControl.value">
   </grid-time-interval>
  <!-- <mat-accordion multi *ngIf="rowsMonthMockData[selectedMonth]">-->

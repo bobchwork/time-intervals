@@ -9,8 +9,8 @@
 >
   <ng-container *ngFor="let col of displayedColumns" matColumnDef="{{col}}">
     <th mat-header-cell *matHeaderCellDef>{{col}}</th>
-    <td mat-cell *matCellDef="let element">
-      <span>{{element.value}} </span>
+    <td mat-cell *matCellDef="let element; let i = index">
+      <span>{{i}} - {{element[getInnerRowIndex(i)] ? element[rowIndexAc-1][col] : ''}} --- {{rowIndexAc}} ----- {{ element[1][col] }}</span>
       <!--<span>{{element.value}}</span>-->
     </td>
   </ng-container>

@@ -1,10 +1,10 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnChanges, OnInit, SimpleChanges} from '@angular/core';
 import {INTERVAL_RANGE_IN_MINUTES} from "../../../../shared/consts";
 
-export interface Tile {
-  color: string
-  cols: number
-  rows: number
+export interface ITile {
+  color?: string
+  cols?: number
+  rows?: number
   text: string
 }
 
@@ -13,30 +13,35 @@ export interface Tile {
   templateUrl: './grid-time-interval.component.html',
   styleUrls: ['./grid-time-interval.component.scss']
 })
-export class GridTimeIntervalComponent implements OnInit {
+export class GridTimeIntervalComponent implements OnInit, OnChanges {
 
-  @Input() dataSource: Array<{}> = []
-  @Input() headings: Array<string> = []
+  @Input() dataSource: Array<Array<any>> = []
+  @Input() headings: Array<{}> = []
   @Input() intervalValue: INTERVAL_RANGE_IN_MINUTES
 
   public intervalsValues = INTERVAL_RANGE_IN_MINUTES
-
-  tiles: Tile[] = [
-    {text: 'One', cols: 3, rows: 1, color: 'lightblue'},
-    {text: 'Two', cols: 1, rows: 2, color: 'lightgreen'},
-    {text: 'Three', cols: 1, rows: 1, color: 'lightpink'},
-    {text: 'Four', cols: 2, rows: 1, color: '#DDBDF1'},
-  ]
+  public dataSourceMainArray = []
+  public rowAcc = 0
+  public sourceData: any;
 
   constructor() {
   }
 
   ngOnInit(): void {
-    console.log(this.headings)
-    console.log(this.dataSource)
 
   }
+  ngOnChanges(changes: SimpleChanges) {
+    if(changes.dataSource) {
+      this.sourceData = changes.dataSource.currentValue
+    }
+  }
+  public getCellValue(cell: any, i: number) {
 
+    const newCell = Object.values(cell)[this.rowAcc]
+    this.rowAcc = this.rowAcc === this.headings.length ? i : this.rowAcc++
+    //console.log(cell)
+    return newCell
+  }
   public isInterval(interval: INTERVAL_RANGE_IN_MINUTES) {
     return this.intervalValue === interval
   }
