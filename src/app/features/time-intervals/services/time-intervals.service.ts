@@ -5,8 +5,7 @@ import {IInterval} from '../../../shared/interfaces/IInterval'
 import * as moment from 'moment'
 import {Moment} from 'moment'
 import {IIntervalData} from "../../../shared/interfaces/IIntervalData";
-import {IColumnsByRange} from "../../../shared/interfaces/IColumnsByRange";
-import {combineAll, combineLatest} from "rxjs/operators";
+import {IColumnsByRange} from "../../../shared/interfaces/IColumnsByRange"
 
 @Injectable({
   providedIn: 'root'
@@ -83,7 +82,7 @@ export class TimeIntervalsService {
   }
 
   public returnSlicedArrayByDay(date: Moment, intervalNumber: number, rowsMonthMockData: any, selectedMonth: number, rowsQuantityInMock: number) {
-    let lastInterval = (60 * 24) / 5
+    let lastInterval = (this.MINS_IN_HOUR * 24) / 5
 
     let startSliceIndex = rowsMonthMockData[selectedMonth].findIndex((item: IIntervalData) => (moment.unix(item.time).format('DD') === date.format('DD')))
     let endSliceIndex = startSliceIndex + (lastInterval * rowsQuantityInMock)
@@ -98,7 +97,7 @@ export class TimeIntervalsService {
     })
   }
 
-  // the conent is already sorted by date, no need to do unnecessary moment comparisons.
+  // the content is already sorted by date, no need to do unnecessary moment comparisons.
   public getComparedColumns(interval: INTERVAL_RANGE_IN_MINUTES, headingIntervalsFullValues: IColumnsByRange, dayRowsData: any, isMonthArray = false, daysInMonth = 30): Observable<any> {
     return new Observable(observer => {
       let columns: Array<any> = []
@@ -113,38 +112,25 @@ export class TimeIntervalsService {
           pivotArray = [...rowsStrArray[day]]
 
           let tar: any = []
-          if(day == 0 ) {
-              console.log(pivotArray)
-              console.log(headingIntervalsFullValues[INTERVAL_RANGE_IN_MINUTES.EVERY_SIXTY])
-          }
           headingIntervalsFullValues[interval].forEach(
-            (headingContent, index) => {
+            () => {
               start = 0
               end = multiplier
+               // here we can decide what to do with the values we can do some calculation or just display them
+              // in this task the values are just displayed with - as a separator
                 tar= [...tar,[pivotArray.splice(start, end).join(' - ')]]
-              columns[day] = [...tar]
+              columns[day] = tar
             }
           )
         }
         observer.next(columns)
-      } else {
-        /*  rowsStrArray = dayRowsData.map((val: IIntervalData) => val.value)
-          slicedRow = [...rowsStrArray]
-          headingIntervalsFullValues[INTERVAL_RANGE_IN_MINUTES.EVERY_FIVE].forEach(
-            (headingContent, index) => {
-              start = index === 0 ? index : start + multiplier
-              end = index === 0 ? multiplier : end + multiplier
-              slicedRow = slicedRow.slice(start, end).join(' ')
-              columns.push({[this.strToEntry(headingContent.intervalName)]: slicedRow})
-              // slicedRow = [...rowsStrArray]
-            }
-          )
-          columns = [columns]
-          observer.next(columns)*/
       }
     })
   }
 
+  // in case more accuracy is needed, this compares the dates.
+  // Assuming from the beginning that there will be events generated every 5 mins, they are already
+  // sorted increasingly, there's no need to make moment calls for such a big amount of items.
   private compareDates(dayRowsData: Array<IIntervalData>, headingContent: IInterval) {
     let isInInterval = false
     let rowsArray: Array<{}> = []

@@ -60,25 +60,25 @@ export class MockDataGeneratorService {
     let randomIndexNumber
     let newDate = date
     for (let interval = 0; interval < intervalsOfFiveInHour; interval++) {
-      randomTime = this.generateTimestampValue(0, 5, newDate)
+      randomTime = MockDataGeneratorService.generateTimestampValue(0, 5, newDate)
       newDate.add(5, 'minutes')
-      randomIndexNumber = this.randomNumber(0, this.randomStrigsArray.length - 1)
+      randomIndexNumber = MockDataGeneratorService.randomNumber(0, this.randomStrigsArray.length - 1)
       oneHourDataArray = [
         ...oneHourDataArray,
         {
-          time: Number(randomTime.format('X')),  // parseInt(randomTime.format('X'))
-          value: randomTime.format('DD-MM-YYYY HH:mm') // this.randomStrigsArray[randomIndexNumber] as string
+          time: Number(randomTime.format('X')),
+          value: this.randomStrigsArray[randomIndexNumber] as string // randomTime.format('DD-MM-YYYY HH:mm') //  for testing
         }
       ]
     }
     return oneHourDataArray
   }
 
-  private generateTimestampValue(min: number, max: number, currentTime: Moment) {
-    return moment(currentTime).add(this.randomNumber(min, max), 'minutes')
+  private static generateTimestampValue(min: number, max: number, currentTime: Moment) {
+    return moment(currentTime).add(MockDataGeneratorService.randomNumber(min, max), 'minutes')
   }
 
-  private randomNumber(min: number, max: number) {
+  private static randomNumber(min: number, max: number) {
     return Math.floor(Math.random() * (max - min + 1) + min)
   }
 }

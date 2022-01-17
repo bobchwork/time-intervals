@@ -1,5 +1,6 @@
 import {Component, Input, OnChanges, OnInit, SimpleChanges} from '@angular/core';
 import {INTERVAL_RANGE_IN_MINUTES} from "../../../../shared/consts";
+import {IIntervalData} from "../../../../shared/interfaces/IIntervalData";
 
 @Component({
   selector: 'grid-time-interval',
@@ -22,11 +23,11 @@ export class GridTimeIntervalComponent implements OnInit, OnChanges {
 
   }
   ngOnChanges(changes: SimpleChanges) {
+
     if(changes.dataSource) {
       this.sourceData = changes.dataSource.currentValue
     }
   }
-
   public isInterval(interval: INTERVAL_RANGE_IN_MINUTES) {
     return this.intervalValue === interval
   }

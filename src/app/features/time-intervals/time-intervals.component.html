@@ -1,44 +1,48 @@
 <div id="time-intervals-view" class="content">
-  <h1>Time intervals view</h1>
-  <mat-accordion>
-    <mat-expansion-panel id="filter" expanded>
-      <mat-expansion-panel-header>
-        <mat-panel-title>
-          Filters
-        </mat-panel-title>
-        <mat-panel-description>
-           Month: {{monthControl.value | date: 'MMMM'}} - Mins: {{intervalControl.value}} - Days in Month: {{daysInMonth}}
-        </mat-panel-description>
-      </mat-expansion-panel-header>
+  <h1>Time intervals view - Random events table</h1>
+  <!--  filter -->
+  <div id="filter-container">
+    <mat-accordion id="filter">
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            Filters
+          </mat-panel-title>
+          <mat-panel-description>
+            Month: {{monthControl.value | date: 'MMMM'}} - Mins: {{intervalControl.value}} - Days in
+            Month: {{daysInMonth}}
+          </mat-panel-description>
+        </mat-expansion-panel-header>
 
-      <div id="time-selector" class="center">
-        <mat-grid-list [cols]="breakpoint" rowHeight="100px" (window:resize)="onResize($event)">
-          <mat-grid-tile [colspan]="1">
-            <mat-form-field id="range-select" appearance="fill">
-              <mat-label>Select the time intervals</mat-label>
-              <mat-select [formControl]="intervalControl">
-                <mat-option [value]="intervalsValues.EVERY_FIVE"> {{ intervals.FIVE_MINS }}</mat-option>
-                <mat-option [value]="intervalsValues.EVERY_THIRTY"> {{ this.intervals.THIRTY_MINS }}</mat-option>
-                <mat-option [value]="intervalsValues.EVERY_SIXTY"> {{ intervals.ONE_HOUR }}</mat-option>
-              </mat-select>
-            </mat-form-field>
-          </mat-grid-tile>
-          <mat-grid-tile [colspan]="1">
-            <mat-form-field id="month-select" appearance="fill">
-              <mat-label>Month to re-generate the data</mat-label>
-              <mat-select [formControl]="monthControl">
-                <mat-option *ngFor="let month of months; let i = index" [value]="i"> {{ month }}</mat-option>
-              </mat-select>
-            </mat-form-field>
-          </mat-grid-tile>
-          <mat-grid-tile>
-            <button mat-raised-button color="accent" (click)="generateMockData(true)">re-generate Mockdata</button>
-          </mat-grid-tile>
-        </mat-grid-list>
-      </div>
-    </mat-expansion-panel>
-  </mat-accordion>
+        <div id="time-selector" class="center">
+          <mat-grid-list [cols]="breakpoint" rowHeight="100px" (window:resize)="onResize($event)">
+            <mat-grid-tile [colspan]="1">
+              <mat-form-field id="range-select" appearance="fill">
+                <mat-label>Select the time intervals</mat-label>
+                <mat-select [formControl]="intervalControl">
+                  <mat-option [value]="intervalsValues.EVERY_FIVE"> {{ intervals.FIVE_MINS }}</mat-option>
+                  <mat-option [value]="intervalsValues.EVERY_THIRTY"> {{ this.intervals.THIRTY_MINS }}</mat-option>
+                  <mat-option [value]="intervalsValues.EVERY_SIXTY"> {{ intervals.ONE_HOUR }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </mat-grid-tile>
+            <mat-grid-tile [colspan]="1">
+              <mat-form-field id="month-select" appearance="fill">
+                <mat-label>Month to re-generate the data</mat-label>
+                <mat-select [formControl]="monthControl">
+                  <mat-option *ngFor="let month of months; let i = index" [value]="i"> {{ month }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </mat-grid-tile>
+            <mat-grid-tile>
+              <button mat-raised-button color="accent" (click)="generateMockData(true)">re-generate Mockdata</button>
+            </mat-grid-tile>
+          </mat-grid-list>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </div>
+  <!--  table with data -->
   <grid-time-interval [headings]="displayedColumns" [dataSource]="dataSource" [intervalValue]="intervalControl.value">
   </grid-time-interval>
-
 </div>
