@@ -1,16 +1,13 @@
 <div id="time-intervals-view" class="content">
-  <h1>Time intervals view - Random events table</h1>
+  <h1>Time intervals view - Random elements table</h1>
   <!--  filter -->
   <div id="filter-container">
     <mat-accordion id="filter">
       <mat-expansion-panel>
         <mat-expansion-panel-header>
-          <mat-panel-title>
-            Filters
-          </mat-panel-title>
+          <mat-panel-title> Filters </mat-panel-title>
           <mat-panel-description>
-            Month: {{monthControl.value | date: 'MMMM'}} - Mins: {{intervalControl.value}} - Days in
-            Month: {{daysInMonth}}
+            Month: {{monthControl.value | date: 'MMMM'}} - Mins: {{intervalControl.value}} - Days in Month: {{daysInMonth}}
           </mat-panel-description>
         </mat-expansion-panel-header>
 
@@ -43,6 +40,5 @@
     </mat-accordion>
   </div>
   <!--  table with data -->
-  <grid-time-interval [headings]="displayedColumns" [dataSource]="dataSource" [intervalValue]="intervalControl.value">
-  </grid-time-interval>
+  <grid-time-interval [headings]="displayedColumns" [dataSource]="dataSource" [intervalValue]="intervalControl.value"> </grid-time-interval>
 </div>

@@ -4,8 +4,8 @@ import {Observable} from 'rxjs'
 import {IInterval} from '../../../shared/interfaces/IInterval'
 import * as moment from 'moment'
 import {Moment} from 'moment'
-import {IIntervalData} from "../../../shared/interfaces/IIntervalData";
-import {IColumnsByRange} from "../../../shared/interfaces/IColumnsByRange"
+import {IIntervalData} from '../../../shared/interfaces/IIntervalData'
+import {IColumnsByRange} from '../../../shared/interfaces/IColumnsByRange'
 
 @Injectable({
   providedIn: 'root'
@@ -70,61 +70,68 @@ export class TimeIntervalsService {
   }
 
   public returnSlicedArrayWithAllDays(intervalNumber: number, rowsMonthMockData: any, selectedMonth: number, rowsQuantityInMock: number) {
-
     let daysInMonth = moment().set('month', selectedMonth).daysInMonth()
     let rows = []
     let date: Moment
     for (let row = 0; row < daysInMonth; row++) {
       date = moment().set('date', row + 1)
-      rows.push(this.returnSlicedArrayByDay(date, intervalNumber, rowsMonthMockData, selectedMonth, rowsQuantityInMock))
+      rows.push(this.returnSlicedArrayByDay(date, intervalNumber, rowsMonthMockData[selectedMonth], rowsQuantityInMock))
     }
     return rows
   }
 
-  public returnSlicedArrayByDay(date: Moment, intervalNumber: number, rowsMonthMockData: any, selectedMonth: number, rowsQuantityInMock: number) {
+  public returnSlicedArrayByDay(
+    date: Moment,
+    intervalNumber: number,
+    rowsMonthMockData: any,
+    rowsQuantityInMock: number
+  ) {
     let lastInterval = (this.MINS_IN_HOUR * 24) / 5
 
-    let startSliceIndex = rowsMonthMockData[selectedMonth].findIndex((item: IIntervalData) => (moment.unix(item.time).format('DD') === date.format('DD')))
-    let endSliceIndex = startSliceIndex + (lastInterval * rowsQuantityInMock)
-    return rowsMonthMockData[selectedMonth].slice(startSliceIndex, endSliceIndex)
+    let startSliceIndex = rowsMonthMockData.findIndex(
+      (item: IIntervalData) => moment.unix(item.time).format('DD') === date.format('DD')
+    )
+    let endSliceIndex = startSliceIndex + lastInterval * rowsQuantityInMock
+    return rowsMonthMockData.slice(startSliceIndex, endSliceIndex)
   }
 
-  public getAllMonthColumnsCompared(selectedMonth: number, interval: INTERVAL_RANGE_IN_MINUTES, headingIntervalsFullValues: IColumnsByRange, dayRowsData: Array<IIntervalData>) {
+  public getAllMonthColumnsCompared(
+    selectedMonth: number,
+    interval: INTERVAL_RANGE_IN_MINUTES,
+    headingIntervalsFullValues: IColumnsByRange,
+    dayRowsData: Array<IIntervalData>
+  ) {
     return new Observable(observer => {
       let daysInMonth = moment().set('month', selectedMonth).daysInMonth()
-      let obsArray = this.getComparedColumns(interval, headingIntervalsFullValues, dayRowsData, true, daysInMonth)
+      let obsArray = this.getComparedColumns(interval, headingIntervalsFullValues, dayRowsData, daysInMonth)
       observer.next(obsArray)
     })
   }
 
   // the content is already sorted by date, no need to do unnecessary moment comparisons.
-  public getComparedColumns(interval: INTERVAL_RANGE_IN_MINUTES, headingIntervalsFullValues: IColumnsByRange, dayRowsData: any, isMonthArray = false, daysInMonth = 30): Observable<any> {
+  public getComparedColumns(
+    interval: INTERVAL_RANGE_IN_MINUTES,
+    headingIntervalsFullValues: IColumnsByRange,
+    dayRowsData: any,
+    daysInMonth = 30
+  ): Observable<any> {
     return new Observable(observer => {
       let columns: Array<any> = []
-      let rowsStrArray: any = []
-      let multiplier = interval / 5
-      let start: number = 0
-      let end: number = 0
+      let start = 0
+      let end = interval / 5
       let pivotArray: any = []
-      if (isMonthArray) {
-        for (let day = 0; day < daysInMonth; day++) {
-          rowsStrArray[day] = dayRowsData[day].map((val: IIntervalData) => val.value)
-          pivotArray = [...rowsStrArray[day]]
+      for (let day = 0; day < daysInMonth; day++) {
+        pivotArray = [...dayRowsData[day].map((val: IIntervalData) => val.value)]
 
-          let tar: any = []
-          headingIntervalsFullValues[interval].forEach(
-            () => {
-              start = 0
-              end = multiplier
-               // here we can decide what to do with the values we can do some calculation or just display them
-              // in this task the values are just displayed with - as a separator
-                tar= [...tar,[pivotArray.splice(start, end).join(' - ')]]
-              columns[day] = tar
-            }
-          )
-        }
-        observer.next(columns)
+        let tar: any = []
+        headingIntervalsFullValues[interval].forEach(() => {
+          // here we can decide what to do with the values we can do some calculation or just display them
+          // in this task the values are just displayed with - as a separator
+          tar = [...tar, [pivotArray.splice(start, end).join(' - ')]]
+          columns[day] = tar
+        })
       }
+      observer.next(columns)
     })
   }
 
@@ -147,11 +154,9 @@ export class TimeIntervalsService {
     return rowsArray
   }
 
-
-// transforms 00:00 - 00:05 into 00000005 so the json looks like [00000005] : 'the str'
+  // transforms 00:00 - 00:05 into 00000005 so the json looks like [00000005] : 'the str'
   public strToEntry(ex: string) {
     let reg = /[\s:-]/g
     return ex.replace(reg, '')
   }
-
 }

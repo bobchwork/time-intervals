@@ -8,8 +8,8 @@ import {IInterval} from '../../shared/interfaces/IInterval'
 import {MockDataGeneratorService} from '../../shared/services/mock-data-generator.service'
 import {IColumnsByRange} from '../../shared/interfaces/IColumnsByRange'
 import * as moment from 'moment'
-import {IIntervalData} from "../../shared/interfaces/IIntervalData";
-import {flatMap} from "rxjs/internal/operators";
+import {IIntervalData} from '../../shared/interfaces/IIntervalData'
+import {flatMap} from 'rxjs/internal/operators'
 
 @Component({
   selector: 'time-intervals',
@@ -45,10 +45,12 @@ export class TimeIntervalsComponent implements OnInit, OnDestroy {
 
   constructor(private timeIntervalService: TimeIntervalsService, private mockDataGenerator: MockDataGeneratorService) {
   }
+
   maxGridCols = 4
   minInnerWidth = 900
+
   ngOnInit(): void {
-    this.breakpoint = (window.innerWidth <= this.minInnerWidth) ? 1 : this.maxGridCols
+    this.breakpoint = window.innerWidth <= this.minInnerWidth ? 1 : this.maxGridCols
     this.generateMockData()
     this.renderTableData(this.intervalsValues.EVERY_FIVE)
     this.intervalControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe(newInterval => {
@@ -63,7 +65,7 @@ export class TimeIntervalsComponent implements OnInit, OnDestroy {
   }
 
   public onResize(event: any) {
-    this.breakpoint = (event.target.innerWidth <= this.minInnerWidth) ? 1 : this.maxGridCols
+    this.breakpoint = event.target.innerWidth <= this.minInnerWidth ? 1 : this.maxGridCols
   }
 
   private renderTableData(interval: INTERVAL_RANGE_IN_MINUTES) {
@@ -76,15 +78,16 @@ export class TimeIntervalsComponent implements OnInit, OnDestroy {
     for (let row = 0; row < this.rowsQuantityInMock; row++) {
       rowsObservables.push(this.sortMonthData(interval))
     }
-    combineLatest(rowsObservables).pipe(
-      take(1),
-      flatMap(v => {
-        return combineLatest(v)
-      }),
-    )
-      .subscribe((rows:[any]) => {
+    combineLatest(rowsObservables)
+      .pipe(
+        take(1),
+        flatMap(v => {
+          return combineLatest(v)
+        })
+      )
+      .subscribe((rows: [any]) => {
         let a = [...rows.flat()]
-        let c = a.map( (b:any) => b.flat())
+        let c = a.map((b: any) => b.flat())
         this.dataSource = c as Array<Array<{}>>
       })
   }
@@ -98,13 +101,18 @@ export class TimeIntervalsComponent implements OnInit, OnDestroy {
     } else {
       intervalNumber = 60
     }
-    let dayRowsData = this.timeIntervalService.returnSlicedArrayWithAllDays(intervalNumber, this.rowsMonthMockData, this.selectedMonth, this.rowsQuantityInMock)
+    let dayRowsData = this.timeIntervalService.returnSlicedArrayWithAllDays(
+      intervalNumber,
+      this.rowsMonthMockData,
+      this.selectedMonth,
+      this.rowsQuantityInMock
+    )
 
     return this.timeIntervalService.getAllMonthColumnsCompared(this.selectedMonth, interval, this.headingIntervalsFullValues, dayRowsData)
   }
 
   private renderIntervalsHeadings(interval: INTERVAL_RANGE_IN_MINUTES) {
-    if (this.isIntervalAndCatched(interval)) {
+    if (this.isIntervalInCache(interval)) {
       this.displayedColumns = this.headingIntervalsFullValues[interval].map(value => value.intervalName)
       return
     }
@@ -130,17 +138,25 @@ export class TimeIntervalsComponent implements OnInit, OnDestroy {
       for (let row = 0; row < rowsNumber; row++) {
         obsArray.push(this.mockDataGenerator.oneMonthData(this.daysInMonth, this.selectedMonth))
       }
-      combineLatest(obsArray).pipe(take(1), map( rows => rows.flat())).subscribe(rows => {
-        this.rowsMonthMockData[this.selectedMonth] = rows
-        this.rowsMonthMockData[this.selectedMonth] = this.rowsMonthMockData[this.selectedMonth].sort(
-          (a: IIntervalData, b: IIntervalData) => (a.value < b.value)
+      combineLatest(obsArray)
+        .pipe(
+          take(1),
+          map((rows:any) => {
+            rows = rows.flat()
+            return rows.sort(
+              (a: IIntervalData, b: IIntervalData) => a.value < b.value
+            )
+          }),
         )
-        this.renderTableData(this.intervalControl.value)
-      })
+        .subscribe(rows => {
+          this.rowsMonthMockData[this.selectedMonth] = rows
+          this.renderTableData(this.intervalControl.value)
+        })
     }
+    return
   }
 
-  private isIntervalAndCatched(interval: INTERVAL_RANGE_IN_MINUTES) {
+  private isIntervalInCache(interval: INTERVAL_RANGE_IN_MINUTES) {
     return this.headingIntervalsFullValues[interval]?.length > 0
   }
 

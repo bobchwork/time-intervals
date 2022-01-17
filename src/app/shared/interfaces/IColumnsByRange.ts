@@ -1,5 +1,5 @@
 import { INTERVAL_RANGE_IN_MINUTES } from '../consts'
-import {IInterval} from "./IInterval";
+import { IInterval } from './IInterval'
 
 export interface IColumnsByRange {
   [INTERVAL_RANGE_IN_MINUTES.EVERY_FIVE]: Array<IInterval>

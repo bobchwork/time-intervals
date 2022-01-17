@@ -3,12 +3,13 @@
   max-height: 400px;
 
   .main-grid-container {
-    overflow-x:auto;
+    overflow-x: auto;
     max-height: 400px;
   }
   .inner-grid-container {
     table {
-      th, td {
+      th,
+      td {
         width: 340px;
         padding: 10px;
       }
@@ -26,7 +27,6 @@
       display: inline-flex;
       height: 100px;
     }
-
   }
 
   text-align: center;

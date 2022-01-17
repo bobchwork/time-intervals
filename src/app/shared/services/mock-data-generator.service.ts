@@ -1,24 +1,22 @@
-import {Injectable} from '@angular/core'
+import { Injectable } from '@angular/core'
 import * as moment from 'moment'
-import {Moment} from 'moment'
-import {IIntervalData} from '../interfaces/IIntervalData'
-import {Observable} from 'rxjs'
-import {ELEMENT_DATA} from "../consts";
+import { Moment } from 'moment'
+import { IIntervalData } from '../interfaces/IIntervalData'
+import { Observable } from 'rxjs'
+import { ELEMENT_DATA } from '../consts'
 
 @Injectable({
   providedIn: 'root'
 })
 export class MockDataGeneratorService {
-  private firstDayCurrentMonth = moment().set({date: 1, hour: 0, minutes: 0, seconds: 0})
+  private firstDayCurrentMonth = moment().set({ date: 1, hour: 0, minutes: 0, seconds: 0 })
   private currentDayOfMonth = this.firstDayCurrentMonth.clone() // as a pivot
   private selectedMonth = this.firstDayCurrentMonth.month()
-  public randomStrigsArray: Array<string> = ELEMENT_DATA.map(({name}) => name)
+  public randomStrigsArray: Array<string> = ELEMENT_DATA.map(({ name }) => name)
 
-  constructor() {
-  }
+  constructor() {}
 
   public oneMonthData(daysInMonth: number, selectedMonth: number = this.selectedMonth) {
-
     this.selectedMonth = selectedMonth
     this.resetFirstDayCurrentMonth(selectedMonth)
     return new Observable(observer => {
@@ -35,11 +33,10 @@ export class MockDataGeneratorService {
   }
 
   public resetFirstDayCurrentMonth(selectedMonth: number) {
-    this.firstDayCurrentMonth.set({date: 1, hour: 0, minutes: 0, seconds: 0})
+    this.firstDayCurrentMonth.set({ date: 1, hour: 0, minutes: 0, seconds: 0 })
     this.firstDayCurrentMonth.set('month', selectedMonth)
     this.currentDayOfMonth = this.firstDayCurrentMonth.clone()
   }
-
 
   public oneDayData() {
     const hoursInADay = 24

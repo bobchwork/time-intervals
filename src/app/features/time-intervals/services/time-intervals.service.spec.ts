@@ -13,7 +13,12 @@ describe('TimeIntervalsService', () => {
   it('should be created', () => {
     expect(service).toBeTruthy()
   })
-  // it should return x amount of intervals when 5 mins is selected
-  // it should return x amount of intervals when 30 mins is selected
-  // it should return x amount of intervals when 1 hour is selected
+  describe('Time intervals management', () => {
+    it('should return 31 elements if the month days is 31 when getAllMonthColumnsCompared is called', () => {
+
+    })
+    it('should return a sliced 288 elements when the raw data is passed to returnSlicedArrayByDay function', () => {
+
+    })
+  })
 })

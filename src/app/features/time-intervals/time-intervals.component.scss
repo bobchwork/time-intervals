@@ -26,7 +26,7 @@
   }
   #month-select {
     position: absolute;
-    left: 0
+    left: 0;
   }
 
   button {
@@ -36,7 +36,9 @@
   }
 
   @media (max-width: 900px) {
-    #range-select, #month-select, button {
+    #range-select,
+    #month-select,
+    button {
       position: relative;
       margin: auto;
     }
@@ -45,6 +47,5 @@
       right: auto;
       top: auto;
     }
-
   }
 }
