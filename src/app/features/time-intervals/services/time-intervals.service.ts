@@ -101,9 +101,9 @@ export class TimeIntervalsService {
   // the conent is already sorted by date, no need to do unnecessary moment comparisons.
   public getComparedColumns(interval: INTERVAL_RANGE_IN_MINUTES, headingIntervalsFullValues: IColumnsByRange, dayRowsData: any, isMonthArray = false, daysInMonth = 30): Observable<any> {
     return new Observable(observer => {
-      // console.log(dayRowsData)
       let columns: Array<any> = []
       let rowsStrArray: any = []
+      let multiplier = interval / 5
       let start: number = 0
       let end: number = 0
       let pivotArray: any = []
@@ -113,8 +113,14 @@ export class TimeIntervalsService {
           pivotArray = [...rowsStrArray[day]]
 
           let tar: any = []
+          if(day == 0 ) {
+              console.log(pivotArray)
+              console.log(headingIntervalsFullValues[INTERVAL_RANGE_IN_MINUTES.EVERY_SIXTY])
+          }
           headingIntervalsFullValues[interval].forEach(
             (headingContent, index) => {
+              start = 0
+              end = multiplier
                 tar= [...tar,[pivotArray.splice(start, end).join(' - ')]]
               columns[day] = [...tar]
             }
