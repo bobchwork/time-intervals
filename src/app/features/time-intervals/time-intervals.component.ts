@@ -1,8 +1,8 @@
 import {Component, OnDestroy, OnInit} from '@angular/core'
 import {INTERVAL_RANGE_IN_MINUTES, INTERVALS, MONTHS} from '../../shared/consts'
 import {FormControl} from '@angular/forms'
-import {combineLatest, forkJoin, Observable, of, Subject} from 'rxjs'
-import {map, switchMap, take, takeUntil, tap} from 'rxjs/operators'
+import {combineLatest, Observable, of, Subject} from 'rxjs'
+import {take, takeUntil} from 'rxjs/operators'
 import {TimeIntervalsService} from './services/time-intervals.service'
 import {IInterval} from '../../shared/interfaces/IInterval'
 import {MockDataGeneratorService} from '../../shared/services/mock-data-generator.service'
@@ -27,6 +27,8 @@ export class TimeIntervalsComponent implements OnInit, OnDestroy {
   private unsubscribe$ = new Subject()
   public displayedColumns: Array<string> = []
   public rowsQuantityInMock = 1 // it multiplies the data N times to populate multiple rows and/or months depending on the case
+
+  breakpoint: number
   /*** contains the full value for the headings. start moment, end moment and label
    * Anther solution is to add a pipe to remove the 3rd property label
    * ***/
@@ -38,13 +40,14 @@ export class TimeIntervalsComponent implements OnInit, OnDestroy {
   public rowsMonthMockData: any = {}
 
   public dataSource: Array<Array<{}>> = []
-  public intervalsDataSource = new MatTableDataSource<any>([])
-  private daysInMonth: number = moment().set({date: 1, month: this.selectedMonth}).daysInMonth()
+  public daysInMonth: number = moment().set({date: 1, month: this.selectedMonth}).daysInMonth()
 
   constructor(private timeIntervalService: TimeIntervalsService, private mockDataGenerator: MockDataGeneratorService) {
   }
-
+  maxGridCols = 4
+  minInnerWidth = 900
   ngOnInit(): void {
+    this.breakpoint = (window.innerWidth <= this.minInnerWidth) ? 1 : this.maxGridCols
     this.generateMockData()
     this.renderTableData(this.intervalsValues.EVERY_FIVE, this.daysInMonth)
     this.intervalControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe(newInterval => {
@@ -57,6 +60,10 @@ export class TimeIntervalsComponent implements OnInit, OnDestroy {
       this.generateMockData()
       this.renderTableData(this.intervalControl.value, this.daysInMonth)
     })
+  }
+
+  public onResize(event: any) {
+    this.breakpoint = (event.target.innerWidth <= this.minInnerWidth) ? 1 : this.maxGridCols
   }
 
   private renderTableData(interval: INTERVAL_RANGE_IN_MINUTES, daysInMonth: number = 30) {

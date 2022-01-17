@@ -10,7 +10,7 @@
         <tr>
           <th *ngFor="let heading of headings">{{ heading }}</th>
         </tr>
-        <tr *ngFor="let row of sourceData let rowIndex = index">
+        <tr *ngFor="let row of sourceData">
           <td *ngFor="let cell of row let i = index">
             <p> {{cell}}</p>
           </td>

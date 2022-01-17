@@ -15,13 +15,32 @@
 #time-selector {
   display: flex;
   flex-direction: column;
+
   #range-select {
     position: absolute;
     left: 5px;
   }
+  #month-select {
+    position: absolute;
+    left: 0
+  }
+
   button {
     position: absolute;
-    right: 5px;
+    right: 0px;
     top: 22px;
+  }
+
+  @media (max-width: 900px) {
+    #range-select, #month-select, button {
+      position: relative;
+      margin: auto;
+    }
+    button {
+      margin-top: 0;
+      right: auto;
+      top: auto;
+    }
+
   }
 }
