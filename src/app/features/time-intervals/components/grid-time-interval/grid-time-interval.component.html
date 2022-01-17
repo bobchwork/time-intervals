@@ -1,28 +1,21 @@
-<!-- eslint-disable -->
 <div id="grid-time-interval">
-  <div
-    class="main-grid-container"
-
-  >
+  <div class="main-grid-container" >
     <div class="inner-grid-container"
          [ngClass]="{
-        'five-min': isInterval(intervalsValues.EVERY_FIVE) && headings.length === sourceData[0]?.length,
-        'thirty-min': isInterval(intervalsValues.EVERY_THIRTY) && headings.length === sourceData[0]?.length,
-        'sixty-min': isInterval(intervalsValues.EVERY_SIXTY) && headings.length === sourceData[0]?.length}"
+        'five-min': isInterval(intervalsValues.EVERY_FIVE),
+        'thirty-min': isInterval(intervalsValues.EVERY_THIRTY),
+        'sixty-min': isInterval(intervalsValues.EVERY_SIXTY)}"
     >
-      <table *ngIf="headings.length === sourceData[0]?.length; else wrongdata">
+      <table>
         <tr>
           <th *ngFor="let heading of headings">{{ heading }}</th>
         </tr>
         <tr *ngFor="let row of sourceData">
           <td *ngFor="let cell of row; let i = index">
-            {{getCellValue(cell, i)}}
+            <p> {{getCellValue(cell, i)}}</p>
           </td>
         </tr>
       </table>
-      <ng-template #wrongdata>
-        <div style="float:left; margin-left: 0; text-align: left;padding:40px"> <h1>Wrong data!</h1></div>
-      </ng-template>
     </div>
   </div>
 </div>
