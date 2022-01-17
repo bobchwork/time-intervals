@@ -33,13 +33,15 @@ export class GridTimeIntervalComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges) {
     if(changes.dataSource) {
       this.sourceData = changes.dataSource.currentValue
+      console.log(this.sourceData.length)
     }
+
   }
   public getCellValue(cell: any, i: number) {
 
     const newCell = Object.values(cell)[this.rowAcc]
     this.rowAcc = this.rowAcc === this.headings.length ? i : this.rowAcc++
-    //console.log(cell)
+    console.log(cell)
     return newCell
   }
   public isInterval(interval: INTERVAL_RANGE_IN_MINUTES) {

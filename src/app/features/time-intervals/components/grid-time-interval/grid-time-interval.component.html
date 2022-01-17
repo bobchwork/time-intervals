@@ -10,9 +10,9 @@
         <tr>
           <th *ngFor="let heading of headings">{{ heading }}</th>
         </tr>
-        <tr *ngFor="let row of sourceData">
-          <td *ngFor="let cell of row; let i = index">
-            <p> {{getCellValue(cell, i)}}</p>
+        <tr *ngFor="let row of sourceData let rowIndex = index">
+          <td *ngFor="let cell of row let i = index">
+            <p> {{cell}}</p>
           </td>
         </tr>
       </table>

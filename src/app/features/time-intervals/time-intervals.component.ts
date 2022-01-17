@@ -1,8 +1,8 @@
 import {Component, OnDestroy, OnInit} from '@angular/core'
 import {INTERVAL_RANGE_IN_MINUTES, INTERVALS, MONTHS} from '../../shared/consts'
 import {FormControl} from '@angular/forms'
-import {combineLatest, Observable, of, Subject} from 'rxjs'
-import {map, take, takeUntil} from 'rxjs/operators'
+import {combineLatest, forkJoin, Observable, of, Subject} from 'rxjs'
+import {map, switchMap, take, takeUntil, tap} from 'rxjs/operators'
 import {TimeIntervalsService} from './services/time-intervals.service'
 import {IInterval} from '../../shared/interfaces/IInterval'
 import {MockDataGeneratorService} from '../../shared/services/mock-data-generator.service'
@@ -10,6 +10,7 @@ import {MatTableDataSource} from '@angular/material/table'
 import {IColumnsByRange} from '../../shared/interfaces/IColumnsByRange'
 import * as moment from 'moment'
 import {IIntervalData} from "../../shared/interfaces/IIntervalData";
+import {flatMap} from "rxjs/internal/operators";
 
 @Component({
   selector: 'time-intervals',
@@ -45,11 +46,6 @@ export class TimeIntervalsComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.generateMockData()
-/*    this.sortMonthData().pipe(takeUntil(this.unsubscribe$)).subscribe( rows => {
-      console.log('all the days')
-      console.log(rows)
-      this.dataSource = rows
-    })*/
     this.renderTableData(this.intervalsValues.EVERY_FIVE, this.daysInMonth)
     this.intervalControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe(newInterval => {
       this.renderTableData(newInterval, this.daysInMonth)
@@ -58,7 +54,6 @@ export class TimeIntervalsComponent implements OnInit, OnDestroy {
     this.monthControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe(month => {
       this.selectedMonth = month
       this.daysInMonth = moment().set({date: 1, month: this.selectedMonth}).daysInMonth()
-      console.log(this.selectedMonth)
       this.generateMockData()
       this.renderTableData(this.intervalControl.value, this.daysInMonth)
     })
@@ -67,7 +62,7 @@ export class TimeIntervalsComponent implements OnInit, OnDestroy {
   private renderTableData(interval: INTERVAL_RANGE_IN_MINUTES, daysInMonth: number = 30) {
     this.renderIntervalsHeadings(interval)
     this.renderIntervalRows(interval)
-    this.sortData()
+   // this.sortData()
   }
 
   public renderIntervalRows(interval: INTERVAL_RANGE_IN_MINUTES) {
@@ -75,11 +70,18 @@ export class TimeIntervalsComponent implements OnInit, OnDestroy {
     for (let row = 0; row < this.rowsQuantityInMock; row++) {
       rowsObservables.push(this.sortMonthData(interval))
     }
-    combineLatest(rowsObservables).pipe(take(1), map( ar => ar.flat() )).subscribe(rows => {
-      //console.log(rows[0])
-      console.log(rows)
-     // this.dataSource = rows
-    })
+    combineLatest(rowsObservables).pipe(
+      take(1),
+      flatMap(v => {
+        let ar = v.flat()
+        return combineLatest(ar)
+      }),
+    )
+      .subscribe((rows:[any]) => {
+        let a = [...rows.flat()]
+        let c = a.map( (b:any) => b.flat())
+        this.dataSource = c as Array<Array<{}>>
+      })
   }
 
   public sortMonthData(interval: INTERVAL_RANGE_IN_MINUTES = INTERVAL_RANGE_IN_MINUTES.EVERY_FIVE) {
@@ -91,20 +93,21 @@ export class TimeIntervalsComponent implements OnInit, OnDestroy {
     } else {
       intervalNumber = 60
     }
-    let dayRowsData = this.timeIntervalService.returnSlicedArrayWithAllDays( intervalNumber, this.rowsMonthMockData, this.selectedMonth, this.rowsQuantityInMock)
-   // console.log(dayRowsData)
-    const allElements = this.rowsMonthMockData[this.selectedMonth]
-    //console.log(moment.unix(allElements[287].time).format('DD-MM-YYYY HH:mm'))
-   // return dayRowsData
-   return this.timeIntervalService.getAllMonthColumnsCompared(this.selectedMonth, interval, this.headingIntervalsFullValues, dayRowsData)
+    let dayRowsData = this.timeIntervalService.returnSlicedArrayWithAllDays(intervalNumber, this.rowsMonthMockData, this.selectedMonth, this.rowsQuantityInMock)
+
+    // return dayRowsData
+    return this.timeIntervalService.getAllMonthColumnsCompared(this.selectedMonth, interval, this.headingIntervalsFullValues, dayRowsData)
   }
+
 //remove
   public sortData() {
     this.sortInXIntervalsByDay(this.intervalControl.value)
       .pipe(take(1)).subscribe((data) => {
       /* console.log(data.concat(data))
        console.log(this.displayedColumns.length)*/
-      this.dataSource = data
+      console.log('in sort ----')
+      console.log(data)
+      //this.dataSource = data
 
     })
   }
@@ -127,6 +130,7 @@ export class TimeIntervalsComponent implements OnInit, OnDestroy {
 
     return this.timeIntervalService.getComparedColumns(interval, this.headingIntervalsFullValues, dayRowsData)
   }
+
   private renderIntervalsHeadings(interval: INTERVAL_RANGE_IN_MINUTES) {
     if (this.isIntervalAndCatched(interval)) {
       this.displayedColumns = this.headingIntervalsFullValues[interval].map(value => value.intervalName)
@@ -140,7 +144,6 @@ export class TimeIntervalsComponent implements OnInit, OnDestroy {
       .calculateIntervals(interval)
       .pipe(take(1))
       .subscribe((values: Array<IInterval>) => {
-     //   console.log(values)
         this.headingIntervalsFullValues[interval] = values
         this.displayedColumns = values.map(value => value.intervalName)
       })

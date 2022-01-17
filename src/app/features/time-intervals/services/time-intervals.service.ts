@@ -83,7 +83,6 @@ export class TimeIntervalsService {
   }
 
   public returnSlicedArrayByDay(date: Moment, intervalNumber: number, rowsMonthMockData: any, selectedMonth: number, rowsQuantityInMock: number) {
-
     let lastInterval = (60 * 24) / 5
 
     let startSliceIndex = rowsMonthMockData[selectedMonth].findIndex((item: IIntervalData) => (moment.unix(item.time).format('DD') === date.format('DD')))
@@ -92,42 +91,51 @@ export class TimeIntervalsService {
   }
 
   public getAllMonthColumnsCompared(selectedMonth: number, interval: INTERVAL_RANGE_IN_MINUTES, headingIntervalsFullValues: IColumnsByRange, dayRowsData: Array<IIntervalData>) {
-    return new Observable( observer => {
+    return new Observable(observer => {
       let daysInMonth = moment().set('month', selectedMonth).daysInMonth()
-      let obsArray = []
-      for(let row = 0 ; row < daysInMonth; row++) {
-        obsArray.push(this.getComparedColumns(interval, headingIntervalsFullValues, dayRowsData, true))
-      }
+      let obsArray = this.getComparedColumns(interval, headingIntervalsFullValues, dayRowsData, true, daysInMonth)
       observer.next(obsArray)
-
     })
   }
+
   // the conent is already sorted by date, no need to do unnecessary moment comparisons.
-  public getComparedColumns(interval: INTERVAL_RANGE_IN_MINUTES, headingIntervalsFullValues: IColumnsByRange, dayRowsData: Array<IIntervalData>, isMonthArray = false): Observable<any> {
+  public getComparedColumns(interval: INTERVAL_RANGE_IN_MINUTES, headingIntervalsFullValues: IColumnsByRange, dayRowsData: any, isMonthArray = false, daysInMonth = 30): Observable<any> {
     return new Observable(observer => {
-     // console.log(dayRowsData)
+      // console.log(dayRowsData)
       let columns: Array<any> = []
       let rowsStrArray: any = []
-/*      if(isMonthArray) {
-        rowsStrArray = dayRowsData.map((val) => val)
-      }*/
-      rowsStrArray = dayRowsData.map(val => val.value)
-      let slicedRow: any = [...rowsStrArray]
-      let multiplier = interval / 5
       let start: number = 0
       let end: number = 0
+      let pivotArray: any = []
+      if (isMonthArray) {
+        for (let day = 0; day < daysInMonth; day++) {
+          rowsStrArray[day] = dayRowsData[day].map((val: IIntervalData) => val.value)
+          pivotArray = [...rowsStrArray[day]]
 
-      headingIntervalsFullValues[INTERVAL_RANGE_IN_MINUTES.EVERY_FIVE].forEach(
-        (headingContent, index) => {
-          start = index === 0 ? index : start + multiplier
-          end = index === 0 ? multiplier : end + multiplier
-          slicedRow = slicedRow.slice(start, end).join(' ')
-          columns.push({[this.strToEntry(headingContent.intervalName)]: slicedRow})
-          slicedRow = [...rowsStrArray]
+          let tar: any = []
+          headingIntervalsFullValues[interval].forEach(
+            (headingContent, index) => {
+                tar= [...tar,[pivotArray.splice(start, end).join(' - ')]]
+              columns[day] = [...tar]
+            }
+          )
         }
-      )
-      columns = [columns]
-      observer.next(columns)
+        observer.next(columns)
+      } else {
+        /*  rowsStrArray = dayRowsData.map((val: IIntervalData) => val.value)
+          slicedRow = [...rowsStrArray]
+          headingIntervalsFullValues[INTERVAL_RANGE_IN_MINUTES.EVERY_FIVE].forEach(
+            (headingContent, index) => {
+              start = index === 0 ? index : start + multiplier
+              end = index === 0 ? multiplier : end + multiplier
+              slicedRow = slicedRow.slice(start, end).join(' ')
+              columns.push({[this.strToEntry(headingContent.intervalName)]: slicedRow})
+              // slicedRow = [...rowsStrArray]
+            }
+          )
+          columns = [columns]
+          observer.next(columns)*/
+      }
     })
   }
 
@@ -141,13 +149,9 @@ export class TimeIntervalsService {
     for (let row = 0; row < dayRowsData.length; row++) {
       isInInterval = moment.unix(dayRowsData[row].time).isBetween(start, end)
       if (isInInterval) {
-        /*console.log(pivotDate.format('DD-MM-YYYY HH:mm'))
-        console.log(headingContent.start.format('DD-MM-YYYY HH:mm'))
-        console.log(pivotDate.isBetween(start, end))*/
         rowsArray = [...rowsArray, {[this.strToEntry(headingContent.intervalName)]: dayRowsData[row].value}]
       }
     }
-    //console.log(rowsArray)
     return rowsArray
   }
 
