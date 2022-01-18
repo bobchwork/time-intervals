@@ -127,9 +127,6 @@ export class TimeIntervalsService {
     })
   }
 
-  // in case more accuracy is needed, this compares the dates.
-  // Assuming from the beginning that there will be events generated every 5 mins, they are already
-  // sorted increasingly, there's no need to make moment calls for such a big amount of items.
   private compareDates(dayRowsData: Array<IIntervalData>, headingContent: IInterval) {
     let isInInterval = false
     let rowsArray: Array<{}> = []

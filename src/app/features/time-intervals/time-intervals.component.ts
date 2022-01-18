@@ -9,7 +9,7 @@ import { MockDataGeneratorService } from '../../shared/services/mock-data-genera
 import { IColumnsByRange } from '../../shared/interfaces/IColumnsByRange'
 import * as moment from 'moment'
 import { IIntervalData } from '../../shared/interfaces/IIntervalData'
-import { flatMap } from 'rxjs/internal/operators'
+import {flatMap} from "rxjs/internal/operators"
 
 @Component({
   selector: 'time-intervals',
