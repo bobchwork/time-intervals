@@ -1,15 +1,15 @@
-import {Component, OnDestroy, OnInit} from '@angular/core'
-import {INTERVAL_RANGE_IN_MINUTES, INTERVALS, MONTHS} from '../../shared/consts'
-import {FormControl} from '@angular/forms'
-import {combineLatest, Subject} from 'rxjs'
-import {map, take, takeUntil} from 'rxjs/operators'
-import {TimeIntervalsService} from './services/time-intervals.service'
-import {IInterval} from '../../shared/interfaces/IInterval'
-import {MockDataGeneratorService} from '../../shared/services/mock-data-generator.service'
-import {IColumnsByRange} from '../../shared/interfaces/IColumnsByRange'
+import { Component, OnDestroy, OnInit } from '@angular/core'
+import { INTERVAL_RANGE_IN_MINUTES, INTERVALS, MONTHS } from '../../shared/consts'
+import { FormControl } from '@angular/forms'
+import { combineLatest, Subject } from 'rxjs'
+import { map, take, takeUntil } from 'rxjs/operators'
+import { TimeIntervalsService } from './services/time-intervals.service'
+import { IInterval } from '../../shared/interfaces/IInterval'
+import { MockDataGeneratorService } from '../../shared/services/mock-data-generator.service'
+import { IColumnsByRange } from '../../shared/interfaces/IColumnsByRange'
 import * as moment from 'moment'
-import {IIntervalData} from '../../shared/interfaces/IIntervalData'
-import {flatMap} from 'rxjs/internal/operators'
+import { IIntervalData } from '../../shared/interfaces/IIntervalData'
+import { flatMap } from 'rxjs/internal/operators'
 
 @Component({
   selector: 'time-intervals',
@@ -41,10 +41,9 @@ export class TimeIntervalsComponent implements OnInit, OnDestroy {
   public rowsMonthMockData: any = {}
 
   public dataSource: Array<Array<{}>> = []
-  public daysInMonth: number = moment().set({date: 1, month: this.selectedMonth}).daysInMonth()
+  public daysInMonth: number = moment().set({ date: 1, month: this.selectedMonth }).daysInMonth()
 
-  constructor(private timeIntervalService: TimeIntervalsService, private mockDataGenerator: MockDataGeneratorService) {
-  }
+  constructor(private timeIntervalService: TimeIntervalsService, private mockDataGenerator: MockDataGeneratorService) {}
 
   maxGridCols = 4
   minInnerWidth = 900
@@ -58,7 +57,7 @@ export class TimeIntervalsComponent implements OnInit, OnDestroy {
     })
     this.monthControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe(month => {
       this.selectedMonth = month
-      this.daysInMonth = moment().set({date: 1, month: this.selectedMonth}).daysInMonth()
+      this.daysInMonth = moment().set({ date: 1, month: this.selectedMonth }).daysInMonth()
       this.generateMockData()
       this.renderTableData(this.intervalControl.value)
     })
@@ -141,12 +140,10 @@ export class TimeIntervalsComponent implements OnInit, OnDestroy {
       combineLatest(obsArray)
         .pipe(
           take(1),
-          map((rows:any) => {
+          map((rows: any) => {
             rows = rows.flat()
-            return rows.sort(
-              (a: IIntervalData, b: IIntervalData) => a.value < b.value
-            )
-          }),
+            return rows.sort((a: IIntervalData, b: IIntervalData) => a.value < b.value)
+          })
         )
         .subscribe(rows => {
           this.rowsMonthMockData[this.selectedMonth] = rows

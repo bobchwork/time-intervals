@@ -1,11 +1,11 @@
-import {Injectable} from '@angular/core'
-import {INTERVAL_RANGE_IN_MINUTES} from '../../../shared/consts'
-import {Observable} from 'rxjs'
-import {IInterval} from '../../../shared/interfaces/IInterval'
+import { Injectable } from '@angular/core'
+import { INTERVAL_RANGE_IN_MINUTES } from '../../../shared/consts'
+import { Observable } from 'rxjs'
+import { IInterval } from '../../../shared/interfaces/IInterval'
 import * as moment from 'moment'
-import {Moment} from 'moment'
-import {IIntervalData} from '../../../shared/interfaces/IIntervalData'
-import {IColumnsByRange} from '../../../shared/interfaces/IColumnsByRange'
+import { Moment } from 'moment'
+import { IIntervalData } from '../../../shared/interfaces/IIntervalData'
+import { IColumnsByRange } from '../../../shared/interfaces/IColumnsByRange'
 
 @Injectable({
   providedIn: 'root'
@@ -13,8 +13,7 @@ import {IColumnsByRange} from '../../../shared/interfaces/IColumnsByRange'
 export class TimeIntervalsService {
   private MINS_IN_HOUR = 60
 
-  constructor() {
-  }
+  constructor() {}
 
   public calculateIntervals(intervalValue: INTERVAL_RANGE_IN_MINUTES): Observable<Array<IInterval>> {
     return this.createDayIntervals(intervalValue)
@@ -80,17 +79,10 @@ export class TimeIntervalsService {
     return rows
   }
 
-  public returnSlicedArrayByDay(
-    date: Moment,
-    intervalNumber: number,
-    rowsMonthMockData: any,
-    rowsQuantityInMock: number
-  ) {
+  public returnSlicedArrayByDay(date: Moment, intervalNumber: number, rowsMonthMockData: any, rowsQuantityInMock: number) {
     let lastInterval = (this.MINS_IN_HOUR * 24) / 5
 
-    let startSliceIndex = rowsMonthMockData.findIndex(
-      (item: IIntervalData) => moment.unix(item.time).format('DD') === date.format('DD')
-    )
+    let startSliceIndex = rowsMonthMockData.findIndex((item: IIntervalData) => moment.unix(item.time).format('DD') === date.format('DD'))
     let endSliceIndex = startSliceIndex + lastInterval * rowsQuantityInMock
     return rowsMonthMockData.slice(startSliceIndex, endSliceIndex)
   }
@@ -148,7 +140,7 @@ export class TimeIntervalsService {
     for (let row = 0; row < dayRowsData.length; row++) {
       isInInterval = moment.unix(dayRowsData[row].time).isBetween(start, end)
       if (isInInterval) {
-        rowsArray = [...rowsArray, {[this.strToEntry(headingContent.intervalName)]: dayRowsData[row].value}]
+        rowsArray = [...rowsArray, { [this.strToEntry(headingContent.intervalName)]: dayRowsData[row].value }]
       }
     }
     return rowsArray
