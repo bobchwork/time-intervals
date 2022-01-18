@@ -8,7 +8,7 @@ import { IIntervalData } from '../../../../shared/interfaces/IIntervalData'
   styleUrls: ['./grid-time-interval.component.scss']
 })
 export class GridTimeIntervalComponent implements OnInit, OnChanges {
-  @Input() dataSource: Array<Array<any>> = []
+  @Input() dataSource: Array<any> = []
   @Input() headings: Array<{}> = []
   @Input() intervalValue: INTERVAL_RANGE_IN_MINUTES
 
@@ -22,6 +22,13 @@ export class GridTimeIntervalComponent implements OnInit, OnChanges {
     if (changes.dataSource) {
       this.sourceData = changes.dataSource.currentValue
     }
+  }
+
+  public isDataLoaded() {
+    if (!this.headings || !this.sourceData) {
+      return false
+    }
+    return this.headings.length > 0 && this.sourceData.length > 0
   }
   public isInterval(interval: INTERVAL_RANGE_IN_MINUTES) {
     return this.intervalValue === interval

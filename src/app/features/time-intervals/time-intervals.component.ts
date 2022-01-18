@@ -106,7 +106,6 @@ export class TimeIntervalsComponent implements OnInit, OnDestroy {
       this.selectedMonth,
       this.rowsQuantityInMock
     )
-
     return this.timeIntervalService.getAllMonthColumnsCompared(this.selectedMonth, interval, this.headingIntervalsFullValues, dayRowsData)
   }
 
@@ -142,7 +141,7 @@ export class TimeIntervalsComponent implements OnInit, OnDestroy {
           take(1),
           map((rows: any) => {
             rows = rows.flat()
-            return rows.sort((a: IIntervalData, b: IIntervalData) => a.value < b.value)
+            return rows.sort((a: IIntervalData, b: IIntervalData) => a.time < b.time)
           })
         )
         .subscribe(rows => {

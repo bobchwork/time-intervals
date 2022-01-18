@@ -3,22 +3,23 @@
     <div
       class="inner-grid-container"
       [ngClass]="{
-        'five-min': isInterval(intervalsValues.EVERY_FIVE),
-        'thirty-min': isInterval(intervalsValues.EVERY_THIRTY),
-        'sixty-min': isInterval(intervalsValues.EVERY_SIXTY)}"
+        'five-min': isInterval(intervalsValues.EVERY_FIVE) && isDataLoaded(),
+        'thirty-min': isInterval(intervalsValues.EVERY_THIRTY) && isDataLoaded(),
+        'sixty-min': isInterval(intervalsValues.EVERY_SIXTY) && isDataLoaded()}"
     >
-      <table>
+      <table *ngIf="isDataLoaded()">
         <thead>
           <tr>
             <th *ngFor="let heading of headings">{{ heading }}</th>
           </tr>
         </thead>
-        <tr *ngFor="let row of sourceData">
+        <tr class="content-row" *ngFor="let row of sourceData">
           <td *ngFor="let cell of row let i = index">
             <p>{{ cell}}</p>
           </td>
         </tr>
       </table>
+      <mat-spinner class="center loading" *ngIf="!isDataLoaded()" #spin> </mat-spinner>
     </div>
   </div>
 </div>
