@@ -105,9 +105,8 @@ export class TimeIntervalsService {
     interval: INTERVAL_RANGE_IN_MINUTES,
     headingIntervalsFullValues: IColumnsByRange,
     dayRowsData: any,
-    daysInMonth : number
+    daysInMonth: number
   ): Observable<any> {
-
     return new Observable(observer => {
       let columns: Array<any> = []
       let start = 0
