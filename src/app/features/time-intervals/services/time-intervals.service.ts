@@ -113,11 +113,11 @@ export class TimeIntervalsService {
       let end = interval / 5
       let pivotArray: any = []
       for (let day = 0; day < daysInMonth; day++) {
+        // here we can decide what to do with the values we can do some calculation or just display them
         pivotArray = [...dayRowsData[day].map((val: IIntervalData) => val.value)]
 
         let tar: any = []
         headingIntervalsFullValues[interval].forEach(() => {
-          // here we can decide what to do with the values we can do some calculation or just display them
           // in this task the values are just displayed with - as a separator
           tar = [...tar, [pivotArray.splice(start, end).join(' - ')]]
           columns[day] = tar
@@ -127,6 +127,11 @@ export class TimeIntervalsService {
     })
   }
 
+  // in case more accuracy is needed, this method makes sure that the dates are between the intervals.
+  // From the beginning, we know that there will be events generated every 5 mins and they were sorted
+  // sorted increasingly, there's no need to make moment calls for such a big amount of items.
+  // it works with a small change in the logic of the previous method. But it is unnecessary for
+  // the current implementation.
   private compareDates(dayRowsData: Array<IIntervalData>, headingContent: IInterval) {
     let isInInterval = false
     let rowsArray: Array<{}> = []
