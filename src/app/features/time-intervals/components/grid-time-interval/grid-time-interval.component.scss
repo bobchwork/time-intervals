@@ -1,11 +1,17 @@
+
 #grid-time-interval {
   max-width: 100%;
   max-height: 400px;
 
   .main-grid-container {
-    overflow-x: auto;
+    overflow: hidden;
     max-height: 400px;
   }
+  .container-viewport {
+    height: 400px;
+    width: 100%;
+  }
+
   .inner-grid-container {
     table {
       th,
@@ -14,15 +20,19 @@
         padding: 10px;
       }
     }
+
     &.five-min {
       width: 75000px;
     }
+
     &.thirty-min {
       width: 12000px;
     }
+
     &.sixty-min {
       width: 6000px;
     }
+
     .heading-row {
       display: inline-flex;
       height: 100px;
@@ -30,6 +40,7 @@
   }
 
   text-align: center;
+
   th {
     text-align: center;
   }

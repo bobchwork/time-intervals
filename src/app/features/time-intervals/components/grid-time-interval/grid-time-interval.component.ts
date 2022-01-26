@@ -1,11 +1,11 @@
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core'
-import { INTERVAL_RANGE_IN_MINUTES } from '../../../../shared/consts'
-import { IIntervalData } from '../../../../shared/interfaces/IIntervalData'
+import {ChangeDetectionStrategy, Component, Input, OnChanges, OnInit, SimpleChanges} from '@angular/core'
+import {INTERVAL_RANGE_IN_MINUTES} from '../../../../shared/consts'
 
 @Component({
   selector: 'grid-time-interval',
   templateUrl: './grid-time-interval.component.html',
-  styleUrls: ['./grid-time-interval.component.scss']
+  styleUrls: ['./grid-time-interval.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class GridTimeIntervalComponent implements OnInit, OnChanges {
   @Input() dataSource: Array<any> = []
