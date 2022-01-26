@@ -95,21 +95,21 @@ describe('TimeIntervalsComponent', () => {
       expect(component.generateMockData).toHaveBeenCalled()
       expect(component.rowsMonthMockData[0].length).toBeGreaterThan(0)
     })
-    it('should set sorted data from low to high int rowsMonthMockData when generateMockData is called', async () => {
+   it('should set sorted data from low to high int rowsMonthMockData when generateMockData is called', async () => {
       expect(component.generateMockData).toHaveBeenCalled()
       let lowest1 = moment('01-01-2022 00:00').unix()
       let highest1 = moment('01-01-2022 00:05').unix()
-      let isBetween1 = moment(component.rowsMonthMockData[0][0].time).isBetween(lowest1, highest1)
+      let isBetween1 = moment(component.rowsMonthMockData[0][0].time).isBetween(lowest1, highest1, null, '[]')
 
       let lowest2 = moment('01-01-2022 00:05').unix()
       let highest2 = moment('01-01-2022 00:10').unix()
-      let isBetween2 = moment(component.rowsMonthMockData[0][1].time).isBetween(lowest2, highest2)
+      let isBetween2 = moment(component.rowsMonthMockData[0][1].time).isBetween(lowest2, highest2, null, '[]')
 
       let lowest3 = moment('01-01-2022 00:10').unix()
       let highest3 = moment('01-01-2022 00:15').unix()
-      let isBetween3 = moment(component.rowsMonthMockData[0][2].time).isBetween(lowest3, highest3)
+      let isBetween3 = moment(component.rowsMonthMockData[0][2].time).isBetween(lowest3, highest3, null, '[]')
 
-      let isBetween4 = moment(component.rowsMonthMockData[0][3].time).isBetween(lowest1, highest1)
+      let isBetween4 = moment(component.rowsMonthMockData[0][3].time).isBetween(lowest1, highest1, null, '[]')
       let isBetween = isBetween1 && isBetween2 && isBetween3 && !isBetween4
       expect(isBetween).toBeTrue()
     })

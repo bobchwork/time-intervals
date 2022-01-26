@@ -23,7 +23,7 @@ describe('TimeIntervalsService', () => {
   it('should be created', () => {
     expect(service).toBeTruthy()
   })
-  fdescribe('Time intervals management', () => {
+  describe('Time intervals management', () => {
     it('should return 288 in the headings if the interval is 5', async () => {
       const observable = service.calculateIntervals(INTERVAL_RANGE_IN_MINUTES.EVERY_FIVE)
       observable.subscribe(value => {

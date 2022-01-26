@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core'
+import {ChangeDetectionStrategy, Component, OnDestroy, OnInit} from '@angular/core'
 import { INTERVAL_RANGE_IN_MINUTES, INTERVALS, MONTHS } from '../../shared/consts'
 import { FormControl } from '@angular/forms'
 import { combineLatest, Subject } from 'rxjs'
@@ -14,7 +14,8 @@ import { flatMap } from 'rxjs/internal/operators'
 @Component({
   selector: 'time-intervals',
   templateUrl: './time-intervals.component.html',
-  styleUrls: ['./time-intervals.component.scss']
+  styleUrls: ['./time-intervals.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TimeIntervalsComponent implements OnInit, OnDestroy {
   public intervals = INTERVALS

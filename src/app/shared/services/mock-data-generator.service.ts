@@ -64,6 +64,7 @@ export class MockDataGeneratorService {
         ...oneHourDataArray,
         {
           time: Number(randomTime.format('X')),
+          // value:  randomTime.format('DD-MM-YYYY HH:mm') as string //
           value: this.randomStrigsArray[randomIndexNumber] as string //  for testing  randomTime.format('DD-MM-YYYY HH:mm') as string //
         }
       ]
